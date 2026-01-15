@@ -1,0 +1,283 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="5ac3f443-0b32-4aba-936c-8e4bac2c3fa4" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/src/nativeInterop/cinterop/llvm.def" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/nativeMain/kotlin/spezi/backend/LLVMBackend.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/nativeMain/kotlin/spezi/cli/SpeziCommand.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/nativeMain/kotlin/spezi/common/Context.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/nativeMain/kotlin/spezi/common/DiagnosticReporter.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/nativeMain/kotlin/spezi/common/SourceFile.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/nativeMain/kotlin/spezi/domain/AST.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/nativeMain/kotlin/spezi/domain/Token.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/nativeMain/kotlin/spezi/domain/Type.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/nativeMain/kotlin/spezi/frontend/Lexer.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/nativeMain/kotlin/spezi/frontend/Parser.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/nativeMain/kotlin/spezi/frontend/TypeChecker.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/gradle.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/build.gradle.kts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/game_debug.c" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/gradle.properties" beforeDir="false" afterPath="$PROJECT_DIR$/gradle.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gradle/libs.versions.toml" beforeDir="false" afterPath="$PROJECT_DIR$/gradle/libs.versions.toml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gradle/wrapper/gradle-wrapper.properties" beforeDir="false" afterPath="$PROJECT_DIR$/gradle/wrapper/gradle-wrapper.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/settings.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/settings.gradle.kts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/nativeMain/kotlin/Main.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/nativeMain/kotlin/Main.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/nativeMain/kotlin/io/github/kvxd/unsafeKt/UnsafeKtDSL.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/nativeMain/kotlin/io/github/kvxd/unsafeKt/mem/InternalUnsafeApi.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/nativeMain/kotlin/io/github/kvxd/unsafeKt/mem/MemoryAccessException.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/nativeMain/kotlin/io/github/kvxd/unsafeKt/mem/MemoryBackend.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/nativeMain/kotlin/io/github/kvxd/unsafeKt/mem/backends/MemFileMemBackend.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/nativeMain/kotlin/io/github/kvxd/unsafeKt/mem/delegate.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/nativeMain/kotlin/io/github/kvxd/unsafeKt/mem/offset/OffsetScope.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/nativeMain/kotlin/io/github/kvxd/unsafeKt/mem/offset/delegate.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/nativeMain/kotlin/io/github/kvxd/unsafeKt/posix/ext.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/nativeMain/kotlin/io/github/kvxd/unsafeKt/proc/Process.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/nativeMain/kotlin/io/github/kvxd/unsafeKt/proc/attach.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/nativeMain/kotlin/io/github/kvxd/unsafeKt/proc/exceptions.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/nativeMain/kotlin/io/github/kvxd/unsafeKt/unsafe.kt" beforeDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ExternalProjectsData">
+    <projectState path="$PROJECT_DIR$">
+      <ProjectState />
+    </projectState>
+  </component>
+  <component name="ExternalProjectsManager">
+    <system id="GRADLE">
+      <state>
+        <task path="$PROJECT_DIR$">
+          <activation />
+        </task>
+        <projects_view>
+          <tree_state>
+            <expand>
+              <path>
+                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
+                <item name="Spezi" type="f1a62948:ProjectNode" />
+              </path>
+              <path>
+                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
+                <item name="Spezi" type="f1a62948:ProjectNode" />
+                <item name="Tasks" type="e4a08cd1:TasksNode" />
+              </path>
+            </expand>
+            <select />
+          </tree_state>
+        </projects_view>
+      </state>
+    </system>
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Kotlin File" />
+        <option value="Kotlin Class" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;0x1bd&quot;
+  }
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/0x1bd/UnsafeKt.git&quot;,
+    &quot;accountId&quot;: &quot;62d78b7f-364c-4f1e-a3ce-bb66a4f3394a&quot;
+  }
+}</component>
+  <component name="GradleScriptDefinitionsStorage" workingDir="$PROJECT_DIR$" gradleHome="$USER_HOME$/.gradle/wrapper/dists/gradle-9.2.1-bin/2t0n5ozlw9xmuyvbp7dnzaxug/gradle-9.2.1" javaHome="$USER_HOME$/.sdkman/candidates/java/25.0.1-graalce" gradleVersion="9.2.1" />
+  <component name="KotlinMultiplatform" KONAN_HOME="$USER_HOME$/.konan/kotlin-native-prebuilt-linux-x86_64-2.3.0">
+    <executable TARGET="linux_x64" TARGET_NAME="native" EXECUTABLE_NAME="Spezi" PROJECT_PREFIX="Spezi:" IS_TEST="false">
+      <variant NAME="Debug" GRADLE_TASK=":linkDebugExecutableNative" FILE="$PROJECT_DIR$/build/bin/native/debugExecutable/Spezi.kexe" WORKING_DIR="$PROJECT_DIR$" PROGRAM_PARAMS="">
+        <envs />
+      </variant>
+      <variant NAME="Release" GRADLE_TASK=":linkReleaseExecutableNative" FILE="$PROJECT_DIR$/build/bin/native/releaseExecutable/Spezi.kexe" WORKING_DIR="$PROJECT_DIR$" PROGRAM_PARAMS="">
+        <envs />
+      </variant>
+    </executable>
+    <executable TARGET="linux_x64" TARGET_NAME="native" EXECUTABLE_NAME="test" PROJECT_PREFIX="Spezi:" IS_TEST="true">
+      <variant NAME="Debug" GRADLE_TASK=":linkDebugTestNative" FILE="$PROJECT_DIR$/build/bin/native/debugTest/test.kexe" WORKING_DIR="" PROGRAM_PARAMS="">
+        <envs />
+      </variant>
+    </executable>
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 8
+}</component>
+  <component name="ProjectId" id="387JkKmUp4mIRjwXNQeSshSGRap" />
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Gradle.Build Debug.executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.Build.executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.Building Kotlin artifacts for KonanApp.executor&quot;: &quot;Run&quot;,
+    &quot;Kotlin/Native Application.Spezi[linux].executor&quot;: &quot;Run&quot;,
+    &quot;Kotlin/Native Application.Spezi[native].executor&quot;: &quot;Run&quot;,
+    &quot;Kotlin/Native Application.UnsafeKt[native].executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/home/kvxd/IdeaProjects/Spezi/build/bin/native/debugExecutable&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;project.structure.last.edited&quot;: &quot;Project&quot;,
+    &quot;project.structure.proportion&quot;: &quot;0.0&quot;,
+    &quot;project.structure.side.proportion&quot;: &quot;0.0&quot;
+  }
+}</component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/build/bin/native/debugExecutable" />
+    </key>
+  </component>
+  <component name="RunManager" selected="Gradle.Build Debug">
+    <configuration name="Build Debug" type="GradleRunConfiguration" factoryName="Gradle">
+      <ExternalSystemSettings>
+        <option name="executionName" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="externalSystemIdString" value="GRADLE" />
+        <option name="scriptParameters" value="" />
+        <option name="taskDescriptions">
+          <list />
+        </option>
+        <option name="taskNames">
+          <list>
+            <option value="linkDebugExecutableNative" />
+          </list>
+        </option>
+        <option name="vmOptions" />
+      </ExternalSystemSettings>
+      <ExternalSystemDebugServerProcess>true</ExternalSystemDebugServerProcess>
+      <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
+      <ExternalSystemDebugDisabled>false</ExternalSystemDebugDisabled>
+      <DebugAllEnabled>false</DebugAllEnabled>
+      <RunAsTest>false</RunAsTest>
+      <GradleProfilingDisabled>false</GradleProfilingDisabled>
+      <GradleCoverageDisabled>false</GradleCoverageDisabled>
+      <method v="2" />
+    </configuration>
+    <configuration name="Build Release" type="GradleRunConfiguration" factoryName="Gradle">
+      <ExternalSystemSettings>
+        <option name="executionName" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="externalSystemIdString" value="GRADLE" />
+        <option name="scriptParameters" value="" />
+        <option name="taskDescriptions">
+          <list />
+        </option>
+        <option name="taskNames">
+          <list>
+            <option value="linkReleaseExecutableNative" />
+          </list>
+        </option>
+        <option name="vmOptions" />
+      </ExternalSystemSettings>
+      <ExternalSystemDebugServerProcess>true</ExternalSystemDebugServerProcess>
+      <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
+      <ExternalSystemDebugDisabled>false</ExternalSystemDebugDisabled>
+      <DebugAllEnabled>false</DebugAllEnabled>
+      <RunAsTest>false</RunAsTest>
+      <GradleProfilingDisabled>false</GradleProfilingDisabled>
+      <GradleCoverageDisabled>false</GradleCoverageDisabled>
+      <method v="2" />
+    </configuration>
+    <configuration default="true" type="JetRunConfigurationType">
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="Spezi[native]" type="KonanRunConfiguration" factoryName="KonanApp" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" WORKING_DIR="file://$PROJECT_DIR$" PASS_PARENT_ENVS_2="true">
+      <executable TARGET="linux_x64" TARGET_NAME="native" EXECUTABLE_NAME="Spezi" PROJECT_PREFIX="Spezi:" IS_TEST="false">
+        <variant NAME="Debug" GRADLE_TASK=":linkDebugExecutableNative" FILE="$PROJECT_DIR$/build/bin/native/debugExecutable/Spezi.kexe" WORKING_DIR="$PROJECT_DIR$" PROGRAM_PARAMS="">
+          <envs />
+        </variant>
+        <variant NAME="Release" GRADLE_TASK=":linkReleaseExecutableNative" FILE="$PROJECT_DIR$/build/bin/native/releaseExecutable/Spezi.kexe" WORKING_DIR="$PROJECT_DIR$" PROGRAM_PARAMS="">
+          <envs />
+        </variant>
+      </executable>
+      <variant NAME="Debug" GRADLE_TASK=":linkDebugExecutableNative" FILE="$PROJECT_DIR$/build/bin/native/debugExecutable/Spezi.kexe" WORKING_DIR="$PROJECT_DIR$" PROGRAM_PARAMS="">
+        <envs />
+      </variant>
+      <method v="2">
+        <option name="com.jetbrains.mpp.KonanBuildTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="UnsafeKt[native]" type="KonanRunConfiguration" factoryName="KonanApp" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" WORKING_DIR="file://$PROJECT_DIR$" PASS_PARENT_ENVS_2="true">
+      <executable TARGET="linux_x64" TARGET_NAME="native" EXECUTABLE_NAME="UnsafeKt" PROJECT_PREFIX="UnsafeKt:" IS_TEST="false">
+        <variant NAME="Debug" GRADLE_TASK=":linkDebugExecutableNative" FILE="$PROJECT_DIR$/build/bin/native/debugExecutable/UnsafeKt.kexe" WORKING_DIR="$PROJECT_DIR$" PROGRAM_PARAMS="">
+          <envs />
+        </variant>
+        <variant NAME="Release" GRADLE_TASK=":linkReleaseExecutableNative" FILE="$PROJECT_DIR$/build/bin/native/releaseExecutable/UnsafeKt.kexe" WORKING_DIR="$PROJECT_DIR$" PROGRAM_PARAMS="">
+          <envs />
+        </variant>
+      </executable>
+      <variant NAME="Debug" GRADLE_TASK=":linkDebugExecutableNative" FILE="$PROJECT_DIR$/build/bin/native/debugExecutable/UnsafeKt.kexe" WORKING_DIR="$PROJECT_DIR$" PROGRAM_PARAMS="">
+        <envs />
+      </variant>
+      <method v="2">
+        <option name="com.jetbrains.mpp.KonanBuildTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration default="true" type="KotlinStandaloneScriptRunConfigurationType">
+      <module name="UnsafeKt" />
+      <option name="filePath" />
+      <method v="2" />
+    </configuration>
+    <list>
+      <item itemvalue="Gradle.Build Release" />
+      <item itemvalue="Gradle.Build Debug" />
+      <item itemvalue="Kotlin/Native Application.UnsafeKt[native]" />
+      <item itemvalue="Kotlin/Native Application.Spezi[native]" />
+    </list>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-jdk-30f59d01ecdd-26cb7f24e5b0-intellij.indexing.shared.core-IU-253.29346.240" />
+        <option value="bundled-js-predefined-d6986cc7102b-9b0f141eb926-JavaScript-IU-253.29346.240" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="5ac3f443-0b32-4aba-936c-8e4bac2c3fa4" name="Changes" comment="" />
+      <created>1768144819273</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1768144819273</updated>
+      <workItem from="1768144820451" duration="712000" />
+      <workItem from="1768154673275" duration="16000" />
+      <workItem from="1768261469476" duration="15000" />
+      <workItem from="1768513453162" duration="3792000" />
+      <workItem from="1768517258779" duration="1050000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+</project>
