@@ -34,23 +34,26 @@ class DiagnosticReporter(private val term: Terminal) {
         val rawLine = source.lines.getOrNull(lineIdx) ?: ""
 
         var padCount = 0
-        val chars = rawLine.toCharArray()
-        for (i in 0 until minOf(loc.col - 1, chars.size)) {
-            padCount += if (chars[i] == '\t') 4 else 1
+        for (i in 0 until minOf(loc.col - 1, rawLine.length)) {
+            padCount += if (rawLine[i] == '\t') 4 else 1
         }
 
         val codeLine = rawLine.replace("\t", "    ")
+        val pointerLen = loc.length.coerceAtLeast(1)
 
         term.println()
         term.println("${color(bold(level))}: $msg")
-        term.println("${gray("-->")} ${source.path}:${loc.line}:${loc.col}")
-        term.println(" ${gray("|")}")
-        term.println("${gray("${loc.line} |")} $codeLine")
+        term.println("  ${gray("-->")} ${source.path}:${loc.line}:${loc.col}")
+        term.println("   ${gray("|")}")
+        term.println("${gray(" ${loc.line} |")} $codeLine")
 
         val pad = " ".repeat(padCount)
-        val pointer = "^".repeat(loc.length.coerceAtLeast(1))
+        val caret = "^".repeat(pointerLen)
 
-        term.println(" ${gray("|")} $pad${color(pointer)}")
+        term.println(
+            "   ${gray("|")} $pad${color(caret)} ${color(msg)}"
+        )
+
         term.println()
     }
 }
