@@ -31,7 +31,19 @@ class DiagnosticReporter(private val term: Terminal) {
         source: SourceFile
     ) {
         val lineIdx = loc.line - 1
-        val codeLine = source.lines.getOrNull(lineIdx)?.replace("\t", "    ") ?: ""
+        val rawLine = source.lines.getOrNull(lineIdx) ?: ""
+
+        var padCount = 0
+        val chars = rawLine.toCharArray()
+        for (i in 0 until minOf(loc.col - 1, chars.size)) {
+            if (chars[i] == '\t') {
+                padCount += 4
+            } else {
+                padCount += 1
+            }
+        }
+
+        val codeLine = rawLine.replace("\t", "    ")
 
         term.println()
         term.println("${color(bold(level))}: $msg")
@@ -39,8 +51,9 @@ class DiagnosticReporter(private val term: Terminal) {
         term.println(" ${gray("|")}")
         term.println("${gray("${loc.line} |")} $codeLine")
 
-        val pad = " ".repeat(loc.col - 1)
+        val pad = " ".repeat(padCount)
         val pointer = "^".repeat(loc.length.coerceAtLeast(1))
+
         term.println(" ${gray("|")} $pad${color(pointer)}")
         term.println()
     }
