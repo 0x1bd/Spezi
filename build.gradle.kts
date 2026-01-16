@@ -23,14 +23,16 @@ kotlin {
 
         binaries {
             executable {
-                linkerOpts(
-                    "-L/usr/lib64",
-                    "-lLLVM-21",
-                    "-z",
-                    "muldefs"
-                )
-
                 entryPoint = "main"
+            }
+        }
+
+        compilations.all {
+            compileTaskProvider.configure {
+                compilerOptions {
+                    freeCompilerArgs.add("-linker-options")
+                    freeCompilerArgs.add("-L/usr/lib64 -lLLVM-21 -z muldefs")
+                }
             }
         }
     }
