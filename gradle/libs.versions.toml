@@ -1,7 +1,11 @@
 [versions]
 kotlin = "2.3.0"
+clikt = "5.1.0"
+okio = "3.16.4"
 
 [libraries]
+clikt = { group = "com.github.ajalt.clikt", name = "clikt", version.ref = "clikt" }
+okio  = { group = "com.squareup.okio", name = "okio",  version.ref = "okio" }
 
 [plugins]
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }

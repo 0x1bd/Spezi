@@ -23,7 +23,12 @@ kotlin {
 
         binaries {
             executable {
-                linkerOpts("-L/usr/lib64", "-lLLVM-21")
+                linkerOpts(
+                    "-L/usr/lib64",
+                    "-lLLVM-21",
+                    "-z",
+                    "muldefs"
+                )
 
                 entryPoint = "main"
             }
@@ -32,9 +37,8 @@ kotlin {
 
     sourceSets {
         nativeMain.dependencies {
-            implementation("com.github.ajalt.clikt:clikt:5.0.3")
-            implementation("com.github.ajalt.mordant:mordant:3.0.2")
-            implementation("com.squareup.okio:okio:3.16.4")
+            implementation(libs.clikt)
+            implementation(libs.okio)
         }
 
         val nativeTest by getting {
