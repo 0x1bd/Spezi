@@ -6,7 +6,7 @@ import platform.posix.*
 import spezi.backend.LLVMBackend
 import spezi.common.*
 import spezi.frontend.Parser
-import spezi.frontend.TypeChecker
+import spezi.frontend.semantic.SemanticAnalyzer
 
 object CompilerDriver {
 
@@ -30,8 +30,8 @@ object CompilerDriver {
             val ast = parser.parseProgram()
 
             if (options.verbose) ctx.reporter.info("Checking...")
-            val checker = TypeChecker(ctx, ast)
-            checker.check()
+            val analyzer = SemanticAnalyzer(ctx, ast)
+            analyzer.analyze()
 
             if (ctx.reporter.hasErrors) return false
 

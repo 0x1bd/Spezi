@@ -1,11 +1,10 @@
 package spezi.frontend
 
-import spezi.common.CompilerException
-import spezi.common.Context
-import spezi.common.SourceFile
+import spezi.common.*
 import spezi.domain.*
 
 class Parser(private val ctx: Context) {
+
     private var lexer = Lexer(ctx)
     private var curr = lexer.next()
     private var prev = curr
@@ -32,7 +31,7 @@ class Parser(private val ctx: Context) {
     private fun check(type: TokenType): Boolean = curr.type == type
 
     private fun errorAtCurrent(msg: String): Nothing {
-        ctx.reporter.error(msg, curr, ctx.source)
+        ctx.reporter.error(msg, curr)
         throw CompilerException("Parse Error")
     }
 
@@ -186,11 +185,38 @@ class Parser(private val ctx: Context) {
     }
 
     private fun parseType(): Type = when (curr.type) {
-        TokenType.KW_I32 -> { advance(); Type.I32 }
-        TokenType.KW_BOOL -> { advance(); Type.Bool }
-        TokenType.KW_STRING -> { advance(); Type.String }
-        TokenType.KW_VOID -> { advance(); Type.Void }
-        TokenType.ID -> { val t = Type.Struct(curr.value); advance(); t }
+        TokenType.KW_I32 -> {
+            advance(); Type.I32
+        }
+
+        TokenType.KW_I64 -> {
+            advance(); Type.I64
+        }
+
+        TokenType.KW_F32 -> {
+            advance(); Type.F32
+        }
+
+        TokenType.KW_F64 -> {
+            advance(); Type.F64
+        }
+
+        TokenType.KW_BOOL -> {
+            advance(); Type.Bool
+        }
+
+        TokenType.KW_STRING -> {
+            advance(); Type.String
+        }
+
+        TokenType.KW_VOID -> {
+            advance(); Type.Void
+        }
+
+        TokenType.ID -> {
+            val t = Type.Struct(curr.value); advance(); t
+        }
+
         else -> errorAtCurrent("Expected type")
     }
 
@@ -259,6 +285,7 @@ class Parser(private val ctx: Context) {
     private fun parseExpr(): Expr = parseBinOp(0)
 
     private fun getPrec(t: TokenType): Int = when (t) {
+        TokenType.AS -> 11
         TokenType.STAR, TokenType.SLASH, TokenType.PERCENT -> 10
         TokenType.PLUS, TokenType.MINUS -> 9
         TokenType.EQEQ, TokenType.NEQ -> 6
@@ -266,13 +293,21 @@ class Parser(private val ctx: Context) {
     }
 
     private fun parseBinOp(minPrec: Int): Expr {
-        var lhs = parsePrimary()
+        var lhs = parseUnary()
         while (true) {
             val prec = getPrec(curr.type)
             if (prec < minPrec) break
 
             val op = curr.type
             val loc = curr
+
+            if (op == TokenType.AS) {
+                advance()
+                val targetType = parseType()
+                lhs = CastExpr(lhs, targetType, loc)
+                continue
+            }
+
             advance()
 
             val rhs = parseBinOp(prec + 1)
@@ -281,10 +316,34 @@ class Parser(private val ctx: Context) {
         return lhs
     }
 
+    private fun parseUnary(): Expr {
+        if (match(TokenType.BANG) || match(TokenType.MINUS)) {
+            val op = prev.type
+            val loc = prev
+            val operand = parseUnary()
+
+            return UnaryOp(op, operand, loc)
+        }
+        return parsePrimary()
+    }
+
     private fun parsePrimary(): Expr {
         val t = curr
 
-        if (match(TokenType.INT_LIT)) return LiteralInt(t.value.toInt(), t)
+        if (match(TokenType.INT_LIT)) {
+            val text = t.value
+            return if (text.endsWith("L")) LiteralInt(text.dropLast(1).toLong(), t).also { it.resolvedType = Type.I64 }
+            else LiteralInt(text.toLong(), t)
+        }
+
+        if (match(TokenType.FLOAT_LIT)) {
+            val text = t.value
+            return if (text.endsWith("f")) LiteralFloat(text.dropLast(1).toDouble(), t).also {
+                it.resolvedType = Type.F32
+            }
+            else LiteralFloat(text.toDouble(), t)
+        }
+
         if (match(TokenType.STRING_LIT)) return LiteralString(t.value, t)
         if (match(TokenType.TRUE)) return LiteralBool(true, t)
         if (match(TokenType.FALSE)) return LiteralBool(false, t)

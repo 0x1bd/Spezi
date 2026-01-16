@@ -24,8 +24,12 @@ class Lexer(private val ctx: Context) {
         "return" to TokenType.RETURN,
         "extern" to TokenType.EXTERN,
         "new" to TokenType.NEW,
+        "as" to TokenType.AS,
         "void" to TokenType.KW_VOID,
         "i32" to TokenType.KW_I32,
+        "i64" to TokenType.KW_I64,
+        "f32" to TokenType.KW_F32,
+        "f64" to TokenType.KW_F64,
         "bool" to TokenType.KW_BOOL,
         "string" to TokenType.KW_STRING,
         "true" to TokenType.TRUE,
@@ -62,7 +66,7 @@ class Lexer(private val ctx: Context) {
             '^' -> makeToken(TokenType.CARET)
             '~' -> makeToken(TokenType.TILDE)
 
-            '!' -> if (match('=')) makeToken(TokenType.NEQ) else error("Unexpected character '!'")
+            '!' -> if (match('=')) makeToken(TokenType.NEQ) else makeToken(TokenType.BANG)
             '=' -> if (match('=')) makeToken(TokenType.EQEQ) else makeToken(TokenType.EQ)
             '<' -> if (match('<')) makeToken(TokenType.LSHIFT) else error("Unexpected '<'")
             '>' -> if (match('>')) makeToken(TokenType.RSHIFT) else error("Unexpected '>'")
@@ -81,6 +85,28 @@ class Lexer(private val ctx: Context) {
 
     private fun scanNumber(): Token {
         while (peek().isDigit()) advance()
+
+        if (peek() == '.' && peek(1).isDigit()) {
+            advance()
+            while (peek().isDigit()) advance()
+
+            if (peek() == 'f') {
+                advance()
+                return makeToken(TokenType.FLOAT_LIT)
+            }
+            return makeToken(TokenType.FLOAT_LIT)
+        }
+
+        if (peek() == 'L') {
+            advance()
+            return makeToken(TokenType.INT_LIT)
+        }
+
+        if (peek() == 'f') {
+            advance()
+            return makeToken(TokenType.FLOAT_LIT)
+        }
+
         return makeToken(TokenType.INT_LIT)
     }
 
@@ -110,7 +136,7 @@ class Lexer(private val ctx: Context) {
         if (isAtEnd()) error("Unterminated string literal")
         advance()
 
-        return Token(TokenType.STRING_LIT, sb.toString(), line, start - lineStart + 1, current - start)
+        return Token(TokenType.STRING_LIT, sb.toString(), ctx.source, line, start - lineStart + 1, current - start)
     }
 
     private fun skipWhitespace() {
@@ -155,16 +181,12 @@ class Lexer(private val ctx: Context) {
 
     private fun makeToken(type: TokenType): Token {
         val text = src.substring(start, current)
-        return Token(type, text, line, start - lineStart + 1, text.length)
-    }
-
-    private fun makeToken(type: TokenType, value: String): Token {
-        return Token(type, value, line, start - lineStart + 1, current - start)
+        return Token(type, text, ctx.source, line, start - lineStart + 1, text.length)
     }
 
     private fun error(msg: String): Nothing {
         val col = start - lineStart + 1
-        ctx.reporter.error(msg, Token(TokenType.EOF, "", line, col, 1), ctx.source)
+        ctx.reporter.error(msg, Token(TokenType.EOF, "", ctx.source, line, col, 1))
         throw CompilerException("Lexing failed")
     }
 }

@@ -2,12 +2,11 @@ package spezi.backend
 
 import kotlinx.cinterop.*
 import llvm.*
-import spezi.common.CompilerException
-import spezi.common.Context
-import spezi.common.Disposable
+import spezi.common.*
 import spezi.domain.*
 
 class LLVMBackend(private val ctx: Context) : Disposable {
+
     private val context = LLVMContextCreate()
     private val module = LLVMModuleCreateWithNameInContext("spezi_module", context)
     private val builder = LLVMCreateBuilderInContext(context)
@@ -29,12 +28,15 @@ class LLVMBackend(private val ctx: Context) : Disposable {
 
     private fun mapType(t: Type): LLVMTypeRef = when (t) {
         Type.I32 -> LLVMInt32TypeInContext(context)!!
+        Type.I64 -> LLVMInt64TypeInContext(context)!!
+        Type.F32 -> LLVMFloatTypeInContext(context)!!
+        Type.F64 -> LLVMDoubleTypeInContext(context)!!
         Type.Bool -> LLVMInt1TypeInContext(context)!!
         Type.String -> LLVMPointerType(LLVMInt8TypeInContext(context), 0u)!!
         Type.Void -> LLVMVoidTypeInContext(context)!!
-        is Type.Struct -> LLVMGetTypeByName(module, t.name) ?: throw CompilerException("Codegen: Unknown struct ${t.name}")
+        is Type.Struct -> LLVMGetTypeByName(module, t.name) ?: LLVMInt32TypeInContext(context)!!
 
-        Type.Unknown, Type.Error -> LLVMInt32TypeInContext(context)!!
+        else -> LLVMInt32TypeInContext(context)!!
     }
 
     private fun getMangledName(name: String, argTypes: List<Type>, extensionOf: Type? = null): String {
@@ -60,6 +62,8 @@ class LLVMBackend(private val ctx: Context) : Disposable {
         }
 
         p.elements.filterIsInstance<ExternFnDef>().forEach { f ->
+            if (externNames.contains(f.name)) return@forEach
+
             externNames.add(f.name)
             val args = f.args.map { mapType(it.second) }.toCValues()
             val ft = LLVMFunctionType(mapType(f.retType), args, f.args.size.toUInt(), 0)
@@ -125,18 +129,21 @@ class LLVMBackend(private val ctx: Context) : Disposable {
                 }
                 symbols.define(s.name, alloca, type, s.isMut)
             }
+
             is Assign -> {
                 val info = symbols.lookup(s.name) ?: throw CompilerException("Backend: Undefined var ${s.name}")
 
                 LLVMBuildStore(builder, genExpr(s.value), info.alloca)
             }
+
             is ReturnStmt -> {
                 if (s.value != null) LLVMBuildRet(builder, genExpr(s.value))
-
                 else LLVMBuildRetVoid(builder)
             }
+
             is IfStmt -> {
-                val cond = LLVMBuildICmp(builder, LLVMIntNE, genExpr(s.cond), LLVMConstInt(mapType(Type.Bool), 0u, 0), "cond")
+                val cond =
+                    LLVMBuildICmp(builder, LLVMIntNE, genExpr(s.cond), LLVMConstInt(mapType(Type.Bool), 0u, 0), "cond")
                 val func = LLVMGetBasicBlockParent(LLVMGetInsertBlock(builder))
                 val thenBB = LLVMAppendBasicBlock(func, "then")
                 val elseBB = LLVMAppendBasicBlock(func, "else")
@@ -160,31 +167,42 @@ class LLVMBackend(private val ctx: Context) : Disposable {
 
                 LLVMPositionBuilderAtEnd(builder, mergeBB)
             }
+
             is Expr -> genExpr(s)
+
             else -> {}
         }
     }
 
     private fun genExpr(e: Expr): LLVMValueRef = when (e) {
         is LiteralInt -> LLVMConstInt(mapType(Type.I32), e.value.toULong(), 0)!!
+        is LiteralFloat -> LLVMConstReal(mapType(e.resolvedType), e.value)!!
         is LiteralBool -> LLVMConstInt(mapType(Type.Bool), if (e.value) 1uL else 0uL, 0)!!
         is LiteralString -> LLVMBuildGlobalStringPtr(builder, e.value, ".str")!!
+
         is VarRef -> {
             val info = symbols.lookup(e.name)!!
             LLVMBuildLoad2(builder, info.type, info.alloca, e.name)!!
         }
-        is BinOp -> {
-            val l = genExpr(e.left)
-            val r = genExpr(e.right)
+
+        is UnaryOp -> {
+            val operand = genExpr(e.operand)
+            val type = e.operand.resolvedType
             when (e.op) {
-                TokenType.PLUS -> LLVMBuildAdd(builder, l, r, "tmp_add")!!
-                TokenType.MINUS -> LLVMBuildSub(builder, l, r, "tmp_sub")!!
-                TokenType.STAR -> LLVMBuildMul(builder, l, r, "tmp_mul")!!
-                TokenType.EQEQ -> LLVMBuildZExt(builder, LLVMBuildICmp(builder, LLVMIntEQ, l, r, "tmp_eq"), mapType(Type.Bool), "zext")!!
-                TokenType.NEQ -> LLVMBuildZExt(builder, LLVMBuildICmp(builder, LLVMIntNE, l, r, "tmp_neq"), mapType(Type.Bool), "zext")!!
-                else -> throw CompilerException("Backend: Op ${e.op} not implemented")
+                TokenType.MINUS -> {
+                    if (type.isFloat()) LLVMBuildFNeg(builder, operand, "fneg")!!
+                    else LLVMBuildNeg(builder, operand, "neg")!!
+                }
+
+                TokenType.BANG -> LLVMBuildNot(builder, operand, "not")!!
+                else -> throw CompilerException("Unknown unary op")
             }
         }
+
+        is BinOp -> genBinOp(e)
+
+        is CastExpr -> genCast(e)
+
         is ConstructorCall -> {
             val stType = mapType(Type.Struct(e.typeName))
             val alloca = LLVMBuildAlloca(builder, stType, "new_st")!!
@@ -194,7 +212,9 @@ class LLVMBackend(private val ctx: Context) : Disposable {
             }
             LLVMBuildLoad2(builder, stType, alloca, "st_val")!!
         }
+
         is Call -> handleCall(e)
+
         is Access -> {
             val obj = e.objectExpr
             if (obj is VarRef) {
@@ -211,6 +231,7 @@ class LLVMBackend(private val ctx: Context) : Disposable {
                 LLVMBuildLoad2(builder, mapType(stDef.fields[idx].second), ptr, "fload")!!
             } else throw CompilerException("Backend: Access only supported on variables")
         }
+
         else -> throw CompilerException("Backend: Unknown expr $e")
     }
 
@@ -229,7 +250,11 @@ class LLVMBackend(private val ctx: Context) : Disposable {
             }
         }
 
-        if (fn == null) throw CompilerException("Backend: Function '${e.name}' not found.")
+        if (fn == null) {
+            fn = LLVMGetNamedFunction(module, e.name)
+        }
+
+        if (fn == null) throw CompilerException("Function '${e.name}' not found.")
 
         val args = e.args.mapIndexed { i, arg ->
             if (isExtension && i == 0) {
@@ -247,8 +272,126 @@ class LLVMBackend(private val ctx: Context) : Disposable {
             } else genExpr(arg)
         }
 
-        LLVMBuildCall2(builder, LLVMGlobalGetValueType(fn), fn, args.toCValues(), args.size.toUInt(),
-            if (LLVMGetTypeKind(LLVMGetReturnType(LLVMGlobalGetValueType(fn))) == LLVMVoidTypeKind) "" else "ret")!!
+        val fnPtrType = LLVMGlobalGetValueType(fn)
+        val declaredParamCount = LLVMCountParamTypes(fnPtrType).toInt()
+        val isVarArg = LLVMIsFunctionVarArg(fnPtrType) == 1
+
+        val needsCast = !isVarArg && declaredParamCount != args.size
+
+        val argTypes = args.map { LLVMTypeOf(it) }.toCValues()
+        val retType = if (e.resolvedType == Type.Void) LLVMVoidTypeInContext(context)!! else mapType(e.resolvedType)
+        val callSig = LLVMFunctionType(retType, argTypes, args.size.toUInt(), 0)
+
+        val castedFn = LLVMBuildBitCast(builder, fn, LLVMPointerType(callSig, 0u), "fn_cast")!!
+
+        LLVMBuildCall2(
+            builder, callSig, castedFn, args.toCValues(), args.size.toUInt(),
+            if (e.resolvedType == Type.Void) "" else "ret"
+        )!!
+    }
+
+    private fun genBinOp(e: BinOp): LLVMValueRef {
+        val l = genExpr(e.left)
+        val r = genExpr(e.right)
+        val type = e.left.resolvedType
+        val isFloat = type.isFloat()
+
+        return when (e.op) {
+            TokenType.PLUS -> if (isFloat) LLVMBuildFAdd(builder, l, r, "fadd")!! else LLVMBuildAdd(
+                builder,
+                l,
+                r,
+                "add"
+            )!!
+
+            TokenType.MINUS -> if (isFloat) LLVMBuildFSub(builder, l, r, "fsub")!! else LLVMBuildSub(
+                builder,
+                l,
+                r,
+                "sub"
+            )!!
+
+            TokenType.STAR -> if (isFloat) LLVMBuildFMul(builder, l, r, "fmul")!! else LLVMBuildMul(
+                builder,
+                l,
+                r,
+                "mul"
+            )!!
+
+            TokenType.SLASH -> {
+                if (isFloat) LLVMBuildFDiv(builder, l, r, "fdiv")!!
+                else {
+                    LLVMBuildSDiv(builder, l, r, "sdiv")!!
+                }
+            }
+
+            TokenType.EQEQ -> {
+                if (isFloat) {
+                    val cmp = LLVMBuildFCmp(builder, LLVMRealPredicate.LLVMRealOEQ, l, r, "feq")
+                    LLVMBuildZExt(builder, cmp, mapType(Type.Bool), "zext")!!
+                } else {
+                    val cmp = LLVMBuildICmp(builder, LLVMIntEQ, l, r, "ieq")
+                    LLVMBuildZExt(builder, cmp, mapType(Type.Bool), "zext")!!
+                }
+            }
+
+            TokenType.NEQ -> {
+                if (isFloat) {
+                    val cmp = LLVMBuildFCmp(builder, LLVMRealPredicate.LLVMRealONE, l, r, "fneq")
+                    LLVMBuildZExt(builder, cmp, mapType(Type.Bool), "zext")!!
+                } else {
+                    val cmp = LLVMBuildICmp(builder, LLVMIntNE, l, r, "ineq")
+                    LLVMBuildZExt(builder, cmp, mapType(Type.Bool), "zext")!!
+                }
+            }
+
+            else -> throw CompilerException("Op not implemented")
+        }
+    }
+
+    private fun genCast(e: CastExpr): LLVMValueRef {
+        val value = genExpr(e.expr)
+        val from = e.expr.resolvedType
+        val to = e.targetType
+        val destType = mapType(to)
+
+        if (from == to) return value
+
+        if (from.isFloat() && to.isFloat()) {
+            return if (from == Type.F32 && to == Type.F64) {
+                LLVMBuildFPExt(builder, value, destType, "fpext")!!
+            } else {
+                LLVMBuildFPTrunc(builder, value, destType, "fptrunc")!!
+            }
+        }
+
+        if (from.isInt() && to.isFloat()) {
+            return LLVMBuildSIToFP(builder, value, destType, "sitofp")!!
+        }
+
+        if (from.isFloat() && to.isInt()) {
+            return LLVMBuildFPToSI(builder, value, destType, "fptosi")!!
+        }
+
+        if (from.isInt() && to.isInt()) {
+            val fromWidth = LLVMGetIntTypeWidth(mapType(from))
+            val toWidth = LLVMGetIntTypeWidth(destType)
+            return if (toWidth > fromWidth) {
+                LLVMBuildSExt(builder, value, destType, "sext")!!
+            } else {
+                LLVMBuildTrunc(builder, value, destType, "trunc")!!
+            }
+        }
+
+        if (from == Type.Bool && to.isInt()) {
+            return LLVMBuildZExt(builder, value, destType, "zext")!!
+        }
+
+        if (from.isInt() && to == Type.Bool) {
+            return LLVMBuildICmp(builder, LLVMIntNE, value, LLVMConstInt(mapType(from), 0u, 0), "tobool")!!
+        }
+
+        throw CompilerException("Backend: Unsupported cast ${from.name} -> ${to.name}")
     }
 
     fun emitToFile(path: String) {

@@ -10,13 +10,13 @@ class DiagnosticReporter(private val term: Terminal) {
     var hasErrors = false
         private set
 
-    fun error(msg: String, loc: Token, source: SourceFile) {
+    fun error(msg: String, loc: Token) {
         hasErrors = true
-        printDiagnostic("ERROR", red, msg, loc, source)
+        printDiagnostic("ERROR", red, msg, loc)
     }
 
-    fun warn(msg: String, loc: Token, source: SourceFile) {
-        printDiagnostic("WARN", yellow, msg, loc, source)
+    fun warn(msg: String, loc: Token) {
+        printDiagnostic("WARN", yellow, msg, loc)
     }
 
     fun info(msg: String) {
@@ -27,20 +27,16 @@ class DiagnosticReporter(private val term: Terminal) {
         level: String,
         color: TextStyle,
         msg: String,
-        loc: Token,
-        source: SourceFile
+        loc: Token
     ) {
+        val source = loc.source
         val lineIdx = loc.line - 1
         val rawLine = source.lines.getOrNull(lineIdx) ?: ""
 
         var padCount = 0
         val chars = rawLine.toCharArray()
         for (i in 0 until minOf(loc.col - 1, chars.size)) {
-            if (chars[i] == '\t') {
-                padCount += 4
-            } else {
-                padCount += 1
-            }
+            padCount += if (chars[i] == '\t') 4 else 1
         }
 
         val codeLine = rawLine.replace("\t", "    ")
