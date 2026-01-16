@@ -2,8 +2,8 @@ plugins {
     alias(libs.plugins.kotlinMultiplatform)
 }
 
-group = "me.user"
-version = "1.0-SNAPSHOT"
+group = "org.kvxd"
+version = "0.1.0"
 
 repositories {
     mavenCentral()
@@ -35,6 +35,12 @@ kotlin {
             implementation("com.github.ajalt.clikt:clikt:5.0.3")
             implementation("com.github.ajalt.mordant:mordant:3.0.2")
             implementation("com.squareup.okio:okio:3.16.4")
+        }
+
+        val nativeTest by getting {
+            dependencies {
+                implementation(kotlin("test"))
+            }
         }
     }
 }

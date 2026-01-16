@@ -6,97 +6,165 @@ import spezi.domain.Token
 import spezi.domain.TokenType
 
 class Lexer(private val ctx: Context) {
+
     private val src = ctx.source.content
-    private var pos = 0
+    private var start = 0
+    private var current = 0
     private var line = 1
     private var lineStart = 0
 
-    private fun peek(offset: Int = 0): Char = if (pos + offset < src.length) src[pos + offset] else '\u0000'
-    private fun advance(): Char {
-        val c = peek()
-        pos++
-        if (c == '\n') { line++; lineStart = pos }
-        return c
-    }
-    private fun error(msg: String): Nothing {
-        val col = pos - lineStart + 1
-        ctx.reporter.error(msg, Token(TokenType.EOF, "", line, col, 1), ctx.source)
-        throw CompilerException("Lexing failed")
-    }
-    private fun makeToken(type: TokenType, value: String, startPos: Int, startLine: Int, startCol: Int) =
-        Token(type, value, startLine, startCol, value.length)
+    private val keywords = mapOf(
+        "let" to TokenType.LET,
+        "mut" to TokenType.MUT,
+        "fn" to TokenType.FN,
+        "struct" to TokenType.STRUCT,
+        "import" to TokenType.IMPORT,
+        "if" to TokenType.IF,
+        "else" to TokenType.ELSE,
+        "return" to TokenType.RETURN,
+        "extern" to TokenType.EXTERN,
+        "new" to TokenType.NEW,
+        "void" to TokenType.KW_VOID,
+        "i32" to TokenType.KW_I32,
+        "bool" to TokenType.KW_BOOL,
+        "string" to TokenType.KW_STRING,
+        "true" to TokenType.TRUE,
+        "false" to TokenType.FALSE
+    )
 
     fun next(): Token {
+        skipWhitespace()
+        start = current
+
+        if (isAtEnd()) return makeToken(TokenType.EOF)
+
+        val c = advance()
+
+        if (c.isLetter() || c == '_') return scanIdentifier()
+        if (c.isDigit()) return scanNumber()
+        if (c == '"') return scanString()
+
+        return when (c) {
+            '(' -> makeToken(TokenType.LPAREN)
+            ')' -> makeToken(TokenType.RPAREN)
+            '{' -> makeToken(TokenType.LBRACE)
+            '}' -> makeToken(TokenType.RBRACE)
+            ',' -> makeToken(TokenType.COMMA)
+            '.' -> makeToken(TokenType.DOT)
+            ':' -> makeToken(TokenType.COLON)
+            '-' -> if (match('>')) makeToken(TokenType.ARROW) else makeToken(TokenType.MINUS)
+            '+' -> makeToken(TokenType.PLUS)
+            '*' -> makeToken(TokenType.STAR)
+            '/' -> makeToken(TokenType.SLASH)
+            '%' -> makeToken(TokenType.PERCENT)
+            '&' -> makeToken(TokenType.AMP)
+            '|' -> makeToken(TokenType.PIPE)
+            '^' -> makeToken(TokenType.CARET)
+            '~' -> makeToken(TokenType.TILDE)
+
+            '!' -> if (match('=')) makeToken(TokenType.NEQ) else error("Unexpected character '!'")
+            '=' -> if (match('=')) makeToken(TokenType.EQEQ) else makeToken(TokenType.EQ)
+            '<' -> if (match('<')) makeToken(TokenType.LSHIFT) else error("Unexpected '<'")
+            '>' -> if (match('>')) makeToken(TokenType.RSHIFT) else error("Unexpected '>'")
+
+            else -> error("Unexpected character: '$c'")
+        }
+    }
+
+    private fun scanIdentifier(): Token {
+        while (peek().isLetterOrDigit() || peek() == '_') advance()
+
+        val text = src.substring(start, current)
+        val type = keywords[text] ?: TokenType.ID
+        return makeToken(type)
+    }
+
+    private fun scanNumber(): Token {
+        while (peek().isDigit()) advance()
+        return makeToken(TokenType.INT_LIT)
+    }
+
+    private fun scanString(): Token {
+        val sb = StringBuilder()
+        while (peek() != '"' && !isAtEnd()) {
+            if (peek() == '\n') {
+                line++; lineStart = current
+            }
+
+            val c = advance()
+            if (c == '\\') {
+                if (isAtEnd()) error("Unterminated string")
+                when (val esc = advance()) {
+                    'n' -> sb.append('\n')
+                    'r' -> sb.append('\r')
+                    't' -> sb.append('\t')
+                    '\\' -> sb.append('\\')
+                    '"' -> sb.append('"')
+                    else -> sb.append(esc)
+                }
+            } else {
+                sb.append(c)
+            }
+        }
+
+        if (isAtEnd()) error("Unterminated string literal")
+        advance()
+
+        return Token(TokenType.STRING_LIT, sb.toString(), line, start - lineStart + 1, current - start)
+    }
+
+    private fun skipWhitespace() {
         while (true) {
             val c = peek()
-            if (c == '\u0000') return Token(TokenType.EOF, "", line, pos - lineStart + 1, 0)
-            if (c.isWhitespace()) { advance(); continue }
-            if (c == '/' && peek(1) == '/') { while (peek() != '\n' && peek() != '\u0000') advance(); continue }
-            break
-        }
-        val (startPos, startLine, startCol) = Triple(pos, line, pos - lineStart + 1)
-        val c = peek()
+            when {
+                c == ' ' || c == '\r' || c == '\t' -> advance()
 
-        fun emit(type: TokenType, text: String? = null) = makeToken(type, text ?: src.substring(startPos, pos), startPos, startLine, startCol)
+                c == '\n' -> {
+                    line++
+                    advance()
+                    lineStart = current
+                }
 
-        if (c.isLetter() || c == '_') {
-            val sb = StringBuilder()
-            while (peek().isLetterOrDigit() || peek() == '_') sb.append(advance())
-            return emit(when (sb.toString()) {
-                "let" -> TokenType.LET
-                "mut" -> TokenType.MUT
-                "fn" -> TokenType.FN
-                "struct" -> TokenType.STRUCT
-                "import" -> TokenType.IMPORT
-                "if" -> TokenType.IF
-                "else" -> TokenType.ELSE
-                "return" -> TokenType.RETURN
-                "extern" -> TokenType.EXTERN
-                "new" -> TokenType.NEW
-                "void" -> TokenType.KW_VOID
-                "i32" -> TokenType.KW_I32
-                "bool" -> TokenType.KW_BOOL
-                "string" -> TokenType.KW_STRING
-                "true" -> TokenType.TRUE
-                "false" -> TokenType.FALSE
-                else -> TokenType.ID
-            })
-        }
-        if (c.isDigit()) { while (peek().isDigit()) advance(); return emit(TokenType.INT_LIT) }
-        if (c == '"') {
-            advance()
-            val sb = StringBuilder()
-            while (peek() != '"' && peek() != '\u0000') {
-                val ch = advance()
-                if (ch == '\\') sb.append(when(advance()){ 'n'->'\n'; 't'->'\t'; 'r'->'\r'; '\\'->'\\'; '"'->'"'; else->'?' }) else sb.append(ch)
+                c == '/' && peek(1) == '/' -> {
+                    while (peek() != '\n' && !isAtEnd()) advance()
+                }
+
+                else -> return
             }
-            if (peek() != '"') error("Unterminated string")
-            advance()
-            return emit(TokenType.STRING_LIT, sb.toString())
         }
-        advance()
-        return when (c) {
-            ':' -> emit(TokenType.COLON)
-            '=' -> if (peek() == '=') { advance(); emit(TokenType.EQEQ) } else emit(TokenType.EQ)
-            '+' -> emit(TokenType.PLUS)
-            '-' -> if (peek() == '>') { advance(); emit(TokenType.ARROW) } else emit(TokenType.MINUS)
-            '*' -> emit(TokenType.STAR)
-            '/' -> emit(TokenType.SLASH)
-            '%' -> emit(TokenType.PERCENT)
-            '&' -> emit(TokenType.AMP)
-            '|' -> emit(TokenType.PIPE)
-            '^' -> emit(TokenType.CARET)
-            '~' -> emit(TokenType.TILDE)
-            '!' -> if (peek() == '=') { advance(); emit(TokenType.NEQ) } else error("Unexpected '!'")
-            '<' -> if (peek() == '<') { advance(); emit(TokenType.LSHIFT) } else error("Unexpected '<'")
-            '>' -> if (peek() == '>') { advance(); emit(TokenType.RSHIFT) } else error("Unexpected '>'")
-            '(' -> emit(TokenType.LPAREN)
-            ')' -> emit(TokenType.RPAREN)
-            '{' -> emit(TokenType.LBRACE)
-            '}' -> emit(TokenType.RBRACE)
-            '.' -> emit(TokenType.DOT)
-            ',' -> emit(TokenType.COMMA)
-            else -> error("Char '$c'")
-        }
+    }
+
+    private fun advance(): Char {
+        current++
+        return src[current - 1]
+    }
+
+    private fun peek(offset: Int = 0): Char {
+        if (current + offset >= src.length) return '\u0000'
+        return src[current + offset]
+    }
+
+    private fun match(expected: Char): Boolean {
+        if (isAtEnd()) return false
+        if (src[current] != expected) return false
+        current++
+        return true
+    }
+
+    private fun isAtEnd() = current >= src.length
+
+    private fun makeToken(type: TokenType): Token {
+        val text = src.substring(start, current)
+        return Token(type, text, line, start - lineStart + 1, text.length)
+    }
+
+    private fun makeToken(type: TokenType, value: String): Token {
+        return Token(type, value, line, start - lineStart + 1, current - start)
+    }
+
+    private fun error(msg: String): Nothing {
+        val col = start - lineStart + 1
+        ctx.reporter.error(msg, Token(TokenType.EOF, "", line, col, 1), ctx.source)
+        throw CompilerException("Lexing failed")
     }
 }

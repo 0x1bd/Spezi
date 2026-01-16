@@ -1,6 +1,7 @@
 package spezi.common
 
 import com.github.ajalt.mordant.rendering.TextColors.*
+import com.github.ajalt.mordant.rendering.TextStyle
 import com.github.ajalt.mordant.rendering.TextStyles.*
 import com.github.ajalt.mordant.terminal.Terminal
 import spezi.domain.Token
@@ -24,7 +25,7 @@ class DiagnosticReporter(private val term: Terminal) {
 
     private fun printDiagnostic(
         level: String,
-        color: com.github.ajalt.mordant.rendering.TextStyle,
+        color: TextStyle,
         msg: String,
         loc: Token,
         source: SourceFile
@@ -45,4 +46,4 @@ class DiagnosticReporter(private val term: Terminal) {
     }
 }
 
-class CompilerException(val msg: String) : RuntimeException(msg)
+class CompilerException(msg: String) : RuntimeException(msg)

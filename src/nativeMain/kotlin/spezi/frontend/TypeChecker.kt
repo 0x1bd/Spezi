@@ -23,7 +23,6 @@ class TypeChecker(private val ctx: Context, private val prog: Program) {
         prog.elements.filterIsInstance<ExternFnDef>().forEach { externs[it.name] = it }
         prog.elements.filterIsInstance<FnDef>().forEach { checkFn(it) }
 
-        // Critical: Stop before backend if errors occurred
         if (hasError) throw CompilerException("Analysis failed")
     }
 
@@ -45,8 +44,6 @@ class TypeChecker(private val ctx: Context, private val prog: Program) {
                 is VarDecl -> {
                     val iType = if (s.init != null) inferType(s.init) else Type.Void
 
-                    // Error Propagation Logic:
-                    // If init failed (Type.Error), we assign Type.Error to variable but DON'T complain about inference
                     if (iType == Type.Error) {
                         scopes.first()[s.name] = Type.Error
                     } else {
@@ -75,8 +72,6 @@ class TypeChecker(private val ctx: Context, private val prog: Program) {
     }
 
     private fun inferType(e: Expr): Type {
-        // ERROR PROPAGATION: If resolved is already Error, return it.
-        // We calculate type, then check if it is error.
         val t = when (e) {
             is LiteralInt -> Type.I32
             is LiteralBool -> Type.Bool
@@ -118,15 +113,11 @@ class TypeChecker(private val ctx: Context, private val prog: Program) {
     }
 
     private fun resolveCall(c: Call): Type {
-        // NOTE: Call ONLY looks at Functions and Externs now. Structs are handled by resolveConstructor
-
-        // 1. Extern
         externs[c.name]?.let {
             checkArgs(it.args.map { a -> a.second }, c.args, c.loc)
             return it.retType
         }
 
-        // 2. Functions & Extensions
         val matches = functions.filter { it.name == c.name }
         for (fn in matches) {
             if (fn.extensionOf != null) {
@@ -149,7 +140,6 @@ class TypeChecker(private val ctx: Context, private val prog: Program) {
 
     private fun checkArgs(expected: List<Type>, actual: List<Expr>, loc: Token) {
         if (!areArgsValid(expected, actual)) {
-            // Only report if none of the args are Errors (avoid double reporting)
             if (actual.none { it.resolvedType == Type.Error })
                 error("Argument mismatch", loc)
         }
@@ -159,7 +149,7 @@ class TypeChecker(private val ctx: Context, private val prog: Program) {
         if (expected.size != actual.size) return false
         for (i in expected.indices) {
             val act = inferType(actual[i])
-            if (act == Type.Error) return true // Assume match to suppress error
+            if (act == Type.Error) return true
             if (expected[i] != act) return false
         }
         return true

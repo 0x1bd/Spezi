@@ -2,261 +2,345 @@ package spezi.frontend
 
 import spezi.common.CompilerException
 import spezi.common.Context
+import spezi.common.SourceFile
 import spezi.domain.*
 
 class Parser(private val ctx: Context) {
+    private var lexer = Lexer(ctx)
+    private var curr = lexer.next()
+    private var prev = curr
 
-    private val lexer = Lexer(ctx)
-    private var curr: Token = lexer.next()
-
-    private fun eat() {
+    private fun advance() {
+        prev = curr
         curr = lexer.next()
     }
 
-    private fun consume() = curr.also { eat() }
-    private fun error(msg: String): Nothing {
-        ctx.reporter.error(msg, curr, ctx.source); throw CompilerException("Parse failed")
+    private fun consume(type: TokenType, msg: String) {
+        if (curr.type == type) {
+            advance()
+            return
+        }
+        errorAtCurrent(msg)
     }
 
-    private fun expect(type: TokenType) =
-        if (curr.type == type) consume() else error("Expected ${type.name}, got ${curr.value}")
+    private fun match(type: TokenType): Boolean {
+        if (!check(type)) return false
+        advance()
+        return true
+    }
+
+    private fun check(type: TokenType): Boolean = curr.type == type
+
+    private fun errorAtCurrent(msg: String): Nothing {
+        ctx.reporter.error(msg, curr, ctx.source)
+        throw CompilerException("Parse Error")
+    }
 
     fun parseProgram(): Program {
-        val loc = curr
+        val startLoc = curr
         val nodes = mutableListOf<AstNode>()
-        while (curr.type != TokenType.EOF) {
-            when (curr.type) {
-                TokenType.IMPORT -> while (curr.type != TokenType.STRUCT && curr.type != TokenType.FN && curr.type != TokenType.EXTERN && curr.type != TokenType.EOF) eat()
-                TokenType.STRUCT -> nodes.add(parseStruct())
-                TokenType.FN -> nodes.add(parseFn())
-                TokenType.EXTERN -> nodes.add(parseExtern())
-                else -> error("Unexpected top-level token")
-            }
-        }
-        return Program(nodes, loc)
+        parseFileContent(nodes)
+        return Program(nodes, startLoc)
     }
 
-    private fun parseType(): Type = when (curr.type) {
-        TokenType.KW_I32 -> {
-            eat(); Type.I32
+    private fun parseFileContent(nodes: MutableList<AstNode>) {
+        while (!check(TokenType.EOF)) {
+            try {
+                when (curr.type) {
+                    TokenType.IMPORT -> parseImport(nodes)
+                    TokenType.STRUCT -> nodes.add(parseStruct())
+                    TokenType.FN -> nodes.add(parseFn())
+                    TokenType.EXTERN -> nodes.add(parseExtern())
+                    else -> errorAtCurrent("Expected top-level declaration (fn, struct, extern, import)")
+                }
+            } catch (e: CompilerException) {
+                throw e
+            }
         }
-
-        TokenType.KW_BOOL -> {
-            eat(); Type.Bool
-        }
-
-        TokenType.KW_STRING -> {
-            eat(); Type.String
-        }
-
-        TokenType.KW_VOID -> {
-            eat(); Type.Void
-        }
-
-        TokenType.ID -> Type.Struct(consume().value)
-        else -> error("Expected type")
     }
 
-    private fun parseStruct() = StructDef(
-        expect(TokenType.STRUCT).let { expect(TokenType.ID).value },
-        mutableListOf<Pair<String, Type>>().also { f ->
-            expect(TokenType.LBRACE)
-            while (curr.type != TokenType.RBRACE) {
-                val n = expect(TokenType.ID).value; expect(TokenType.COLON);
-                val t = parseType()
-                f.add(n to t)
-                if (curr.type == TokenType.COMMA) eat()
+    private fun parseImport(nodes: MutableList<AstNode>) {
+        advance()
+
+        val sb = StringBuilder()
+        if (!check(TokenType.ID)) errorAtCurrent("Expected module name")
+        sb.append(curr.value)
+        advance()
+
+        while (match(TokenType.DOT)) {
+            if (!check(TokenType.ID)) errorAtCurrent("Expected module part after '.'")
+            sb.append(".")
+            sb.append(curr.value)
+            advance()
+        }
+
+        val importName = sb.toString()
+        val path = ctx.resolveImport(importName)
+            ?: errorAtCurrent("Could not resolve import '$importName'")
+
+        if (ctx.isModuleLoaded(path)) {
+            if (ctx.options.verbose) ctx.reporter.info("Recursive import skipped: $path")
+            return
+        }
+
+        if (ctx.options.verbose) ctx.reporter.info("Importing module: $path")
+
+        val prevSrc = ctx.source
+        val prevLex = lexer
+        val prevTok = curr
+
+        ctx.source = SourceFile.fromPath(path)
+        lexer = Lexer(ctx)
+        curr = lexer.next()
+
+        parseFileContent(nodes)
+
+        ctx.source = prevSrc
+        lexer = prevLex
+        curr = prevTok
+    }
+
+    private fun parseStruct(): StructDef {
+        val loc = curr
+        consume(TokenType.STRUCT, "Expected 'struct'")
+
+        if (!check(TokenType.ID)) errorAtCurrent("Expected struct name")
+        val name = curr.value
+        advance()
+
+        consume(TokenType.LBRACE, "Expected '{'")
+        val fields = mutableListOf<Pair<String, Type>>()
+
+        while (!check(TokenType.RBRACE) && !check(TokenType.EOF)) {
+            if (!check(TokenType.ID)) errorAtCurrent("Expected field name")
+            val fName = curr.value
+            advance()
+
+            consume(TokenType.COLON, "Expected ':'")
+            val fType = parseType()
+            fields.add(fName to fType)
+
+            if (!check(TokenType.RBRACE)) {
+                consume(TokenType.COMMA, "Expected ',' between fields")
             }
-            expect(TokenType.RBRACE)
-        },
-        curr
-    )
+        }
+        consume(TokenType.RBRACE, "Expected '}'")
+        return StructDef(name, fields, loc)
+    }
 
     private fun parseExtern(): ExternFnDef {
-        val loc = expect(TokenType.EXTERN)
-        expect(TokenType.FN)
-        val name = expect(TokenType.ID).value
-        expect(TokenType.LPAREN)
-        val args = mutableListOf<Pair<String, Type>>()
-        while (curr.type != TokenType.RPAREN) {
-            val n = expect(TokenType.ID).value; expect(TokenType.COLON);
-            val t = parseType()
-            args.add(n to t)
-            if (curr.type == TokenType.COMMA) eat()
-        }
-        expect(TokenType.RPAREN)
-        expect(TokenType.ARROW)
-        return ExternFnDef(name, args, parseType(), loc)
+        val loc = curr
+        consume(TokenType.EXTERN, "Expected 'extern'")
+        consume(TokenType.FN, "Expected 'fn'")
+
+        if (!check(TokenType.ID)) errorAtCurrent("Expected function name")
+        val name = curr.value
+        advance()
+
+        val args = parseArgList()
+        consume(TokenType.ARROW, "Expected '->'")
+        val ret = parseType()
+
+        return ExternFnDef(name, args, ret, loc)
     }
 
     private fun parseFn(): FnDef {
-        val loc = expect(TokenType.FN)
-        var name = expect(TokenType.ID).value
-        var ext: Type? = null
-        if (curr.type == TokenType.DOT) {
-            eat(); ext = Type.Struct(name); name = expect(TokenType.ID).value
+        val loc = curr
+        consume(TokenType.FN, "Expected 'fn'")
+
+        if (!check(TokenType.ID)) errorAtCurrent("Expected function name")
+        var name = curr.value
+        advance()
+
+        var extensionOf: Type? = null
+        if (match(TokenType.DOT)) {
+            extensionOf = Type.Struct(name)
+            if (!check(TokenType.ID)) errorAtCurrent("Expected method name")
+            name = curr.value
+            advance()
         }
-        expect(TokenType.LPAREN)
-        val args = mutableListOf<Pair<String, Type>>()
-        while (curr.type != TokenType.RPAREN) {
-            val n = expect(TokenType.ID).value; expect(TokenType.COLON);
-            val t = parseType()
-            args.add(n to t)
-            if (curr.type == TokenType.COMMA) eat()
-        }
-        expect(TokenType.RPAREN)
-        expect(TokenType.ARROW)
+
+        val args = parseArgList()
+        consume(TokenType.ARROW, "Expected '->'")
         val ret = parseType()
-        return FnDef(name, ext, args, ret, parseBlock(), loc)
+
+        val body = parseBlock()
+        return FnDef(name, extensionOf, args, ret, body, loc)
+    }
+
+    private fun parseArgList(): List<Pair<String, Type>> {
+        consume(TokenType.LPAREN, "Expected '('")
+        val args = mutableListOf<Pair<String, Type>>()
+        if (!check(TokenType.RPAREN)) {
+            do {
+                if (!check(TokenType.ID)) errorAtCurrent("Expected argument name")
+                val n = curr.value
+                advance()
+                consume(TokenType.COLON, "Expected ':'")
+                val t = parseType()
+                args.add(n to t)
+            } while (match(TokenType.COMMA))
+        }
+        consume(TokenType.RPAREN, "Expected ')'")
+        return args
+    }
+
+    private fun parseType(): Type = when (curr.type) {
+        TokenType.KW_I32 -> { advance(); Type.I32 }
+        TokenType.KW_BOOL -> { advance(); Type.Bool }
+        TokenType.KW_STRING -> { advance(); Type.String }
+        TokenType.KW_VOID -> { advance(); Type.Void }
+        TokenType.ID -> { val t = Type.Struct(curr.value); advance(); t }
+        else -> errorAtCurrent("Expected type")
     }
 
     private fun parseBlock(): Block {
-        val loc = expect(TokenType.LBRACE)
+        val loc = curr
+        consume(TokenType.LBRACE, "Expected '{'")
         val stmts = mutableListOf<AstNode>()
-        while (curr.type != TokenType.RBRACE && curr.type != TokenType.EOF) stmts.add(parseStmt())
-        expect(TokenType.RBRACE)
+        while (!check(TokenType.RBRACE) && !check(TokenType.EOF)) {
+            stmts.add(parseStmt())
+        }
+        consume(TokenType.RBRACE, "Expected '}'")
         return Block(stmts, mutableListOf(), loc)
     }
 
-    private fun parseStmt(): AstNode = when (curr.type) {
-        TokenType.LET -> {
-            val loc = consume()
-            val mut = if (curr.type == TokenType.MUT) {
-                eat(); true
-            } else false
-            val name = expect(TokenType.ID).value
-            val type = if (curr.type == TokenType.COLON) {
-                eat(); parseType()
-            } else null
-            val init = if (curr.type == TokenType.EQ) {
-                eat(); parseExpr()
-            } else null
-            VarDecl(name, type, mut, init, loc)
-        }
+    private fun parseStmt(): AstNode {
+        if (match(TokenType.LET)) return parseVarDecl()
+        if (match(TokenType.IF)) return parseIf()
+        if (match(TokenType.RETURN)) return parseReturn()
 
-        TokenType.IF -> {
-            val loc = consume();
-            val c = parseExpr();
-            val t = parseBlock()
-            val e = if (curr.type == TokenType.ELSE) {
-                eat(); parseBlock()
-            } else null
-            IfStmt(c, t, e, loc)
+        val expr = parseExpr()
+        if (match(TokenType.EQ)) {
+            if (expr !is VarRef) errorAtCurrent("Invalid assignment target")
+            val valExpr = parseExpr()
+            return Assign(expr.name, valExpr, expr.loc)
         }
-
-        TokenType.RETURN -> ReturnStmt(
-            if (consume().type != TokenType.RBRACE && curr.type != TokenType.RBRACE) parseExpr() else null,
-            curr
-        )
-
-        else -> {
-            val expr = parseExpr()
-            if (curr.type == TokenType.EQ) {
-                if (expr !is VarRef) error("Invalid assignment")
-                eat(); Assign(expr.name, parseExpr(), expr.loc)
-            } else expr
-        }
+        return expr
     }
 
-    private fun parseExpr() = parseBinOp(0)
-    private fun parseBinOp(prec: Int): Expr {
-        var left = parsePrimary()
-        while (true) {
-            val p = when (curr.type) {
-                TokenType.STAR, TokenType.SLASH, TokenType.PERCENT -> 10
-                TokenType.PLUS, TokenType.MINUS -> 9
-                TokenType.EQEQ, TokenType.NEQ -> 6
-                else -> -1
-            }
-            if (p < prec) return left
-            val op = consume().type
-            left = BinOp(left, op, parseBinOpRecursive(parsePrimary(), p + 1), curr)
-        }
+    private fun parseVarDecl(): VarDecl {
+        val loc = prev
+        val isMut = match(TokenType.MUT)
+
+        if (!check(TokenType.ID)) errorAtCurrent("Expected variable name")
+        val name = curr.value
+        advance()
+
+        var type: Type? = null
+        if (match(TokenType.COLON)) type = parseType()
+
+        var init: Expr? = null
+        if (match(TokenType.EQ)) init = parseExpr()
+
+        return VarDecl(name, type, isMut, init, loc)
     }
 
-    private fun parseBinOpRecursive(lhs: Expr, minPrec: Int): Expr {
-        var left = lhs
-        while (true) {
-            val p = when (curr.type) {
-                TokenType.STAR, TokenType.SLASH, TokenType.PERCENT -> 10
-                TokenType.PLUS, TokenType.MINUS -> 9
-                TokenType.EQEQ, TokenType.NEQ -> 6
-                else -> -1
-            }
-            if (p < minPrec) return left
-            val op = consume().type
-            val nextP = when (curr.type) {
-                TokenType.STAR, TokenType.SLASH, TokenType.PERCENT -> 10
-                TokenType.PLUS, TokenType.MINUS -> 9
-                TokenType.EQEQ, TokenType.NEQ -> 6
-                else -> -1
-            }
-            var right = parsePrimary()
-            if (p < nextP) right = parseBinOpRecursive(right, p + 1)
-            left = BinOp(left, op, right, curr)
+    private fun parseIf(): IfStmt {
+        val loc = prev
+        val cond = parseExpr()
+        val thenBlock = parseBlock()
+        var elseBlock: Block? = null
+        if (match(TokenType.ELSE)) {
+            elseBlock = parseBlock()
         }
+        return IfStmt(cond, thenBlock, elseBlock, loc)
+    }
+
+    private fun parseReturn(): ReturnStmt {
+        val loc = prev
+        if (check(TokenType.RBRACE) || check(TokenType.EOF)) {
+            return ReturnStmt(null, loc)
+        }
+        val value = parseExpr()
+        return ReturnStmt(value, loc)
+    }
+
+    private fun parseExpr(): Expr = parseBinOp(0)
+
+    private fun getPrec(t: TokenType): Int = when (t) {
+        TokenType.STAR, TokenType.SLASH, TokenType.PERCENT -> 10
+        TokenType.PLUS, TokenType.MINUS -> 9
+        TokenType.EQEQ, TokenType.NEQ -> 6
+        else -> -1
+    }
+
+    private fun parseBinOp(minPrec: Int): Expr {
+        var lhs = parsePrimary()
+        while (true) {
+            val prec = getPrec(curr.type)
+            if (prec < minPrec) break
+
+            val op = curr.type
+            val loc = curr
+            advance()
+
+            val rhs = parseBinOp(prec + 1)
+            lhs = BinOp(lhs, op, rhs, loc)
+        }
+        return lhs
     }
 
     private fun parsePrimary(): Expr {
-        // ENFORCE NEW: parse 'new Vector()' as ConstructorCall
-        if (curr.type == TokenType.NEW) {
-            eat()
-            val name = expect(TokenType.ID).value
-            expect(TokenType.LPAREN)
-            val args = mutableListOf<Expr>()
-            if (curr.type != TokenType.RPAREN) do {
-                args.add(parseExpr())
-                if (curr.type == TokenType.COMMA) eat()
-            } while (curr.type != TokenType.RPAREN)
-            expect(TokenType.RPAREN)
-            return ConstructorCall(name, args, curr)
-        }
         val t = curr
-        if (t.type == TokenType.INT_LIT) {
-            eat(); return LiteralInt(t.value.toInt(), t)
-        }
-        if (t.type == TokenType.STRING_LIT) {
-            eat(); return LiteralString(t.value, t)
-        }
-        if (t.type == TokenType.TRUE) {
-            eat(); return LiteralBool(true, t)
-        }
-        if (t.type == TokenType.FALSE) {
-            eat(); return LiteralBool(false, t)
-        }
-        if (t.type == TokenType.ID) {
-            val name = t.value; eat()
-            var node: Expr = if (curr.type == TokenType.LPAREN) {
-                val args = mutableListOf<Expr>()
-                eat()
-                if (curr.type != TokenType.RPAREN) do {
-                    args.add(parseExpr())
-                    if (curr.type == TokenType.COMMA) eat()
-                } while (curr.type != TokenType.RPAREN)
-                expect(TokenType.RPAREN)
-                Call(name, args, t)
-            } else VarRef(name, t)
 
-            while (curr.type == TokenType.DOT) {
-                val loc = consume()
-                val mem = expect(TokenType.ID).value
-                if (curr.type == TokenType.LPAREN) {
-                    val args = mutableListOf<Expr>(); args.add(node) // Implicit Self
-                    eat()
-                    if (curr.type != TokenType.RPAREN) do {
-                        args.add(parseExpr())
-                        if (curr.type == TokenType.COMMA) eat()
-                    } while (curr.type != TokenType.RPAREN)
-                    expect(TokenType.RPAREN)
-                    node = Call(mem, args, loc)
-                } else node = Access(node, mem, loc)
+        if (match(TokenType.INT_LIT)) return LiteralInt(t.value.toInt(), t)
+        if (match(TokenType.STRING_LIT)) return LiteralString(t.value, t)
+        if (match(TokenType.TRUE)) return LiteralBool(true, t)
+        if (match(TokenType.FALSE)) return LiteralBool(false, t)
+
+        if (match(TokenType.NEW)) {
+            if (!check(TokenType.ID)) errorAtCurrent("Expected struct name after 'new'")
+            val name = curr.value
+            advance()
+            val args = parseCallArgs()
+            return ConstructorCall(name, args, t)
+        }
+
+        if (match(TokenType.LPAREN)) {
+            val e = parseExpr()
+            consume(TokenType.RPAREN, "Expected ')'")
+            return e
+        }
+
+        if (match(TokenType.ID)) {
+            var node: Expr = if (check(TokenType.LPAREN)) {
+                Call(t.value, parseCallArgs(), t)
+            } else {
+                VarRef(t.value, t)
+            }
+
+            while (match(TokenType.DOT)) {
+                val loc = prev
+                if (!check(TokenType.ID)) errorAtCurrent("Expected member name")
+                val member = curr.value
+                advance()
+
+                if (check(TokenType.LPAREN)) {
+                    val rawArgs = parseCallArgs()
+                    val argsWithSelf = mutableListOf<Expr>()
+                    argsWithSelf.add(node)
+                    argsWithSelf.addAll(rawArgs)
+                    node = Call(member, argsWithSelf, loc)
+                } else {
+                    node = Access(node, member, loc)
+                }
             }
             return node
         }
-        if (t.type == TokenType.LPAREN) {
-            eat();
-            val e = parseExpr(); expect(TokenType.RPAREN); return e
+
+        errorAtCurrent("Unexpected token: ${t.value}")
+    }
+
+    private fun parseCallArgs(): List<Expr> {
+        consume(TokenType.LPAREN, "Expected '('")
+        val args = mutableListOf<Expr>()
+        if (!check(TokenType.RPAREN)) {
+            do {
+                args.add(parseExpr())
+            } while (match(TokenType.COMMA))
         }
-        error("Unexpected token ${t.value}")
+        consume(TokenType.RPAREN, "Expected ')'")
+        return args
     }
 }
