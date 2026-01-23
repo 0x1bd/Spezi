@@ -17,6 +17,11 @@ class SemanticAnalyzer(private val ctx: Context, private val prog: Program) {
         hasError = true
     }
 
+    private fun reportError(msg: String) {
+        ctx.reporter.error(msg)
+        hasError = true
+    }
+
     fun analyze() {
         if (ctx.options.verbose) ctx.reporter.info("Semantic Analysis")
 
@@ -31,6 +36,11 @@ class SemanticAnalyzer(private val ctx: Context, private val prog: Program) {
         }
 
         prog.elements.filterIsInstance<FnDef>().forEach { checkFn(it) }
+
+        prog.elements.filterIsInstance<FnDef>()
+            .firstOrNull { it.name == "main" } ?: run {
+                reportError("Missing main function")
+        }
 
         if (hasError) throw CompilerException("Analysis failed")
     }

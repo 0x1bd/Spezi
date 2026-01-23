@@ -15,6 +15,11 @@ class DiagnosticReporter(private val term: Terminal) {
         printDiagnostic("ERROR", red, msg, loc)
     }
 
+    fun error(msg: String) {
+        hasErrors = true
+        printDiagnostic("ERROR", red, msg)
+    }
+
     fun warn(msg: String, loc: Token) {
         printDiagnostic("WARN", yellow, msg, loc)
     }
@@ -54,6 +59,16 @@ class DiagnosticReporter(private val term: Terminal) {
             "   ${gray("|")} $pad${color(caret)} ${color(msg)}"
         )
 
+        term.println()
+    }
+
+    private fun printDiagnostic(
+        level: String,
+        color: TextStyle,
+        msg: String
+    ) {
+        term.println()
+        term.println("${color(bold(level))}: $msg")
         term.println()
     }
 }

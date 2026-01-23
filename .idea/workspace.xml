@@ -5,13 +5,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="5ac3f443-0b32-4aba-936c-8e4bac2c3fa4" name="Changes" comment="feat: Drastically improve kotlin/native compilation speed">
-      <change afterPath="$PROJECT_DIR$/src/nativeTest/kotlin/spezi/tests/TestUtils.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/gradle.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/gradle.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/build.gradle.kts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/nativeTest/kotlin/spezi/test/IntegrationTests.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/nativeTest/kotlin/spezi/test/LexerParserTests.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/nativeTest/kotlin/spezi/test/SemanticFailureTests.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/nativeTest/kotlin/spezi/test/TestUtils.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/nativeMain/kotlin/spezi/common/DiagnosticReporter.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/nativeMain/kotlin/spezi/common/DiagnosticReporter.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/nativeMain/kotlin/spezi/frontend/semantic/SemanticAnalyzer.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/nativeMain/kotlin/spezi/frontend/semantic/SemanticAnalyzer.kt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -67,12 +66,17 @@
 }</component>
   <component name="GithubPullRequestsUISettings">{
   &quot;selectedUrlAndAccountId&quot;: {
-    &quot;url&quot;: &quot;https://github.com/0x1bd/UnsafeKt.git&quot;,
-    &quot;accountId&quot;: &quot;62d78b7f-364c-4f1e-a3ce-bb66a4f3394a&quot;
+    &quot;url&quot;: &quot;https://github.com/0x1bd/Spezi.git&quot;,
+    &quot;accountId&quot;: &quot;9d76a070-3de4-4d33-acc6-75965a9c6984&quot;
   }
 }</component>
-  <component name="GradleScriptDefinitionsStorage" workingDir="$PROJECT_DIR$" gradleHome="$USER_HOME$/.gradle/wrapper/dists/gradle-9.2.1-bin/2t0n5ozlw9xmuyvbp7dnzaxug/gradle-9.2.1" javaHome="$USER_HOME$/.jdks/temurin-25.0.1" gradleVersion="9.2.1" />
+  <component name="GradleScriptDefinitionsStorage" workingDir="$PROJECT_DIR$" gradleHome="$USER_HOME$/.gradle/wrapper/dists/gradle-9.2.1-bin/2t0n5ozlw9xmuyvbp7dnzaxug/gradle-9.2.1" javaHome="$USER_HOME$/.jdks/graalvm-ce-25.0.1" gradleVersion="9.2.1" />
   <component name="KotlinMultiplatform" KONAN_HOME="$USER_HOME$/.konan/kotlin-native-prebuilt-linux-x86_64-2.3.0">
+    <executable TARGET="linux_x64" TARGET_NAME="native" EXECUTABLE_NAME="test" PROJECT_PREFIX="Spezi:" IS_TEST="true">
+      <variant NAME="Debug" GRADLE_TASK=":linkDebugTestNative" FILE="$PROJECT_DIR$/build/bin/native/debugTest/test.kexe" WORKING_DIR="" PROGRAM_PARAMS="">
+        <envs />
+      </variant>
+    </executable>
     <executable TARGET="linux_x64" TARGET_NAME="native" EXECUTABLE_NAME="Spezi" PROJECT_PREFIX="Spezi:" IS_TEST="false">
       <variant NAME="Debug" GRADLE_TASK=":linkDebugExecutableNative" FILE="$PROJECT_DIR$/build/bin/native/debugExecutable/Spezi.kexe" WORKING_DIR="$PROJECT_DIR$" PROGRAM_PARAMS="">
         <envs />
@@ -81,11 +85,10 @@
         <envs />
       </variant>
     </executable>
-    <executable TARGET="linux_x64" TARGET_NAME="native" EXECUTABLE_NAME="test" PROJECT_PREFIX="Spezi:" IS_TEST="true">
-      <variant NAME="Debug" GRADLE_TASK=":linkDebugTestNative" FILE="$PROJECT_DIR$/build/bin/native/debugTest/test.kexe" WORKING_DIR="" PROGRAM_PARAMS="">
-        <envs />
-      </variant>
-    </executable>
+  </component>
+  <component name="McpProjectServerCommands">
+    <commands />
+    <urls />
   </component>
   <component name="ProblemsViewState">
     <option name="selectedTabId" value="QODANA_PROBLEMS_VIEW_TAB" />
@@ -101,48 +104,46 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "Gradle.Build Debug.executor": "Run",
-    "Gradle.Build Release.executor": "Run",
-    "Gradle.Build.executor": "Run",
-    "Gradle.Building Kotlin artifacts for KonanApp.executor": "Run",
-    "Gradle.IntegrationTests.executor": "Run",
-    "Gradle.LexerParserTests.executor": "Run",
-    "Gradle.SemanticFailureTests.executor": "Run",
-    "Gradle.Spezi [test].executor": "Run",
-    "Gradle.Test.executor": "Run",
-    "Kotlin/Native Application.Spezi[linux].executor": "Run",
-    "Kotlin/Native Application.Spezi[native].executor": "Run",
-    "Kotlin/Native Application.UnsafeKt[native].executor": "Run",
-    "ModuleVcsDetector.initialDetectionPerformed": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
-    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "git-widget-placeholder": "master",
-    "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "/home/kvxd/IdeaProjects/Spezi",
-    "nodejs_package_manager_path": "npm",
-    "project.structure.last.edited": "Project",
-    "project.structure.proportion": "0.0",
-    "project.structure.side.proportion": "0.0"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ASKED_SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;Gradle.Build Debug.executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.Build Release.executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.Build.executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.Building Kotlin artifacts for KonanApp.executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.IntegrationTests.executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.LexerParserTests.executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.SemanticFailureTests.executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.Spezi [test].executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.Test.executor&quot;: &quot;Run&quot;,
+    &quot;Kotlin/Native Application.Spezi[linux].executor&quot;: &quot;Run&quot;,
+    &quot;Kotlin/Native Application.Spezi[native].executor&quot;: &quot;Run&quot;,
+    &quot;Kotlin/Native Application.UnsafeKt[native].executor&quot;: &quot;Run&quot;,
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.MCP Project settings loaded&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
+    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/home/kvxd/IdeaProjects/Spezi&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;project.structure.last.edited&quot;: &quot;Project&quot;,
+    &quot;project.structure.proportion&quot;: &quot;0.0&quot;,
+    &quot;project.structure.side.proportion&quot;: &quot;0.0&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;settings.sync&quot;,
+    &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
-  <component name="QodanaHighlightedReportService">
-    <option name="localRunNotPublishedPersistedInfo">
-      <LocalReportPersistedInfo>
-        <option name="path" value="/tmp/qodana_output/qodana.sarif.json" />
-        <option name="reportGuid" value="4991b0aa-7ffc-46e3-af09-dfec866cee87" />
-        <option name="reportName" value="Spezi/qodana/2026-01-16" />
-      </LocalReportPersistedInfo>
-    </option>
-  </component>
-  <component name="QodanaIsSelectedPersistenceService">
-    <option name="selectedOrLoading" value="true" />
-  </component>
+}</component>
   <component name="QodanaReportsService">
     <option name="descriptions">
       <ReportDescription localRun="true" path="/tmp/qodana_output/qodana.sarif.json" reportGuid="4991b0aa-7ffc-46e3-af09-dfec866cee87" reportId="Spezi/qodana/2026-01-16" />
@@ -153,7 +154,7 @@
       <recent name="$PROJECT_DIR$/build/bin/native/debugExecutable" />
     </key>
   </component>
-  <component name="RunManager" selected="Gradle.Test">
+  <component name="RunManager" selected="Gradle.Build Debug">
     <configuration name="Build Debug" type="GradleRunConfiguration" factoryName="Gradle">
       <ExternalSystemSettings>
         <option name="executionName" />
@@ -230,11 +231,6 @@
       <GradleCoverageDisabled>false</GradleCoverageDisabled>
       <method v="2" />
     </configuration>
-    <configuration default="true" type="JetRunConfigurationType">
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
     <configuration name="Spezi[native]" type="KonanRunConfiguration" factoryName="KonanApp" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" WORKING_DIR="file://$PROJECT_DIR$" PASS_PARENT_ENVS_2="true">
       <executable TARGET="linux_x64" TARGET_NAME="native" EXECUTABLE_NAME="Spezi" PROJECT_PREFIX="Spezi:" IS_TEST="false">
         <variant NAME="Debug" GRADLE_TASK=":linkDebugExecutableNative" FILE="$PROJECT_DIR$/build/bin/native/debugExecutable/Spezi.kexe" WORKING_DIR="$PROJECT_DIR$" PROGRAM_PARAMS="">
@@ -271,8 +267,8 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-jdk-30f59d01ecdd-26cb7f24e5b0-intellij.indexing.shared.core-IU-253.29346.240" />
-        <option value="bundled-js-predefined-d6986cc7102b-9b0f141eb926-JavaScript-IU-253.29346.240" />
+        <option value="bundled-jdk-30f59d01ecdd-26cb7f24e5b0-intellij.indexing.shared.core-IU-253.29346.138" />
+        <option value="bundled-js-predefined-d6986cc7102b-9b0f141eb926-JavaScript-IU-253.29346.138" />
       </set>
     </attachedChunks>
   </component>
@@ -289,6 +285,9 @@
       <workItem from="1768513453162" duration="3792000" />
       <workItem from="1768517258779" duration="1050000" />
       <workItem from="1768521519275" duration="2327000" />
+      <workItem from="1769187962630" duration="7311000" />
+      <workItem from="1769195828758" duration="311000" />
+      <workItem from="1769202241988" duration="463000" />
     </task>
     <task id="LOCAL-00001" summary="chore: initial commit">
       <option name="closed" value="true" />
