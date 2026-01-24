@@ -6,6 +6,8 @@ import platform.posix.system
 import spezi.backend.LLVMBackend
 import spezi.common.*
 import spezi.common.diagnostic.CompilerException
+import spezi.common.diagnostic.Level
+import spezi.common.diagnostic.report
 import spezi.frontend.Parser
 import spezi.frontend.semantic.SemanticAnalyzer
 import kotlin.time.measureTime
@@ -73,7 +75,8 @@ object CompilerDriver {
             return CompilationResult.Success(time)
 
         } catch (e: Exception) {
-            ctx.reporter.error("Compiler Error: ${e.message}")
+            ctx.report(Level.ERROR, "Compiler error: ${e.message}")
+
             if (options.verbose) {
                 e.printStackTrace()
             }

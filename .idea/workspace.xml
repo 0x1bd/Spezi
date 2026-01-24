@@ -4,10 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="5ac3f443-0b32-4aba-936c-8e4bac2c3fa4" name="Changes" comment="refactor: Diagnostic Reporting Levels">
+    <list default="true" id="5ac3f443-0b32-4aba-936c-8e4bac2c3fa4" name="Changes" comment="feat: Improve compilation time by using LLC instead of clang for compilation">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/nativeMain/kotlin/spezi/cli/SpeziCommand.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/nativeMain/kotlin/spezi/cli/SpeziCommand.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/nativeMain/kotlin/spezi/driver/CompilerDriver.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/nativeMain/kotlin/spezi/driver/CompilerDriver.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/nativeMain/kotlin/spezi/frontend/Lexer.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/nativeMain/kotlin/spezi/frontend/Lexer.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/nativeMain/kotlin/spezi/frontend/Parser.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/nativeMain/kotlin/spezi/frontend/Parser.kt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -70,16 +71,16 @@
 }</component>
   <component name="GradleScriptDefinitionsStorage" workingDir="$PROJECT_DIR$" gradleHome="$USER_HOME$/.gradle/wrapper/dists/gradle-9.2.1-bin/2t0n5ozlw9xmuyvbp7dnzaxug/gradle-9.2.1" javaHome="$USER_HOME$/.jdks/graalvm-ce-25.0.1" gradleVersion="9.2.1" />
   <component name="KotlinMultiplatform" KONAN_HOME="$USER_HOME$/.konan/kotlin-native-prebuilt-linux-x86_64-2.3.0">
-    <executable TARGET="linux_x64" TARGET_NAME="native" EXECUTABLE_NAME="test" PROJECT_PREFIX="Spezi:" IS_TEST="true">
-      <variant NAME="Debug" GRADLE_TASK=":linkDebugTestNative" FILE="$PROJECT_DIR$/build/bin/native/debugTest/test.kexe" WORKING_DIR="" PROGRAM_PARAMS="">
-        <envs />
-      </variant>
-    </executable>
     <executable TARGET="linux_x64" TARGET_NAME="native" EXECUTABLE_NAME="Spezi" PROJECT_PREFIX="Spezi:" IS_TEST="false">
       <variant NAME="Debug" GRADLE_TASK=":linkDebugExecutableNative" FILE="$PROJECT_DIR$/build/bin/native/debugExecutable/Spezi.kexe" WORKING_DIR="$PROJECT_DIR$" PROGRAM_PARAMS="">
         <envs />
       </variant>
       <variant NAME="Release" GRADLE_TASK=":linkReleaseExecutableNative" FILE="$PROJECT_DIR$/build/bin/native/releaseExecutable/Spezi.kexe" WORKING_DIR="$PROJECT_DIR$" PROGRAM_PARAMS="">
+        <envs />
+      </variant>
+    </executable>
+    <executable TARGET="linux_x64" TARGET_NAME="native" EXECUTABLE_NAME="test" PROJECT_PREFIX="Spezi:" IS_TEST="true">
+      <variant NAME="Debug" GRADLE_TASK=":linkDebugTestNative" FILE="$PROJECT_DIR$/build/bin/native/debugTest/test.kexe" WORKING_DIR="" PROGRAM_PARAMS="">
         <envs />
       </variant>
     </executable>
@@ -289,7 +290,7 @@
       <workItem from="1769187962630" duration="7311000" />
       <workItem from="1769195828758" duration="311000" />
       <workItem from="1769202241988" duration="1765000" />
-      <workItem from="1769244795073" duration="4623000" />
+      <workItem from="1769244795073" duration="5818000" />
     </task>
     <task id="LOCAL-00001" summary="chore: initial commit">
       <option name="closed" value="true" />
@@ -339,7 +340,15 @@
       <option name="project" value="LOCAL" />
       <updated>1769246555999</updated>
     </task>
-    <option name="localTasksCounter" value="7" />
+    <task id="LOCAL-00007" summary="feat: Improve compilation time by using LLC instead of clang for compilation">
+      <option name="closed" value="true" />
+      <created>1769250470352</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1769250470352</updated>
+    </task>
+    <option name="localTasksCounter" value="8" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -352,6 +361,7 @@
     <MESSAGE value="refactor" />
     <MESSAGE value="fix: Don't allow structs to be 'int32s'" />
     <MESSAGE value="refactor: Diagnostic Reporting Levels" />
-    <option name="LAST_COMMIT_MESSAGE" value="refactor: Diagnostic Reporting Levels" />
+    <MESSAGE value="feat: Improve compilation time by using LLC instead of clang for compilation" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: Improve compilation time by using LLC instead of clang for compilation" />
   </component>
 </project>

@@ -2,6 +2,8 @@ package spezi.frontend
 
 import spezi.common.diagnostic.CompilerException
 import spezi.common.Context
+import spezi.common.diagnostic.Level
+import spezi.common.diagnostic.report
 import spezi.domain.Token
 import spezi.domain.TokenType
 
@@ -186,7 +188,7 @@ class Lexer(private val ctx: Context) {
 
     private fun error(msg: String): Nothing {
         val col = start - lineStart + 1
-        ctx.reporter.error(msg, Token(TokenType.EOF, "", ctx.source, line, col, 1))
+        ctx.report(Level.ERROR, msg, Token(TokenType.EOF, "", ctx.source, line, col, 1))
         throw CompilerException("Lexing failed")
     }
 }
