@@ -63,14 +63,14 @@ class DiagnosticReporter(private val term: Terminal, private val ctx: Context) {
         term.println()
         term.println("${color(bold(level))}: $msg")
         term.println("  ${gray("-->")} ${source.path}:${loc.line}:${loc.col}")
-        term.println("   ${gray("|")}")
+        term.println("    ${gray("|")}")
         term.println("${gray(" ${loc.line} |")} $codeLine")
 
         val pad = " ".repeat(padCount)
         val caret = "^".repeat(pointerLen)
 
         term.println(
-            "   ${gray("|")} $pad${color(caret)} ${color(msg)}"
+            "    ${gray("|")} $pad${color(caret)} ${color(msg)}"
         )
 
         term.println()
@@ -84,5 +84,27 @@ class DiagnosticReporter(private val term: Terminal, private val ctx: Context) {
         term.println()
         term.println("${color(bold(level))}: $msg")
         term.println()
+    }
+}
+
+enum class Level {
+    INFO,
+    WARN,
+    ERROR
+}
+
+fun Context.report(level: Level, msg: String) {
+    when (level) {
+        Level.INFO -> reporter.info(msg)
+        Level.WARN -> reporter.warn(msg)
+        Level.ERROR -> reporter.error(msg)
+    }
+}
+
+fun Context.report(level: Level, msg: String, loc: Token) {
+    when (level) {
+        Level.INFO -> reporter.info(msg)
+        Level.WARN -> reporter.warn(msg, loc)
+        Level.ERROR -> reporter.error(msg, loc)
     }
 }

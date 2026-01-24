@@ -4,20 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="5ac3f443-0b32-4aba-936c-8e4bac2c3fa4" name="Changes" comment="refactor">
-      <change afterPath="$PROJECT_DIR$/src/nativeMain/kotlin/spezi/common/CompilationOptions.kt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/nativeMain/kotlin/spezi/common/CompilationState.kt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/nativeMain/kotlin/spezi/common/diagnostic/CompilerException.kt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/nativeMain/kotlin/spezi/driver/CompilationResult.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/nativeMain/kotlin/spezi/backend/LLVMBackend.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/nativeMain/kotlin/spezi/backend/LLVMBackend.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/nativeMain/kotlin/spezi/cli/SpeziCommand.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/nativeMain/kotlin/spezi/cli/SpeziCommand.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/nativeMain/kotlin/spezi/common/Context.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/nativeMain/kotlin/spezi/common/Context.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/nativeMain/kotlin/spezi/common/DiagnosticReporter.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/nativeMain/kotlin/spezi/common/diagnostic/DiagnosticReporter.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/nativeMain/kotlin/spezi/driver/CompilerDriver.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/nativeMain/kotlin/spezi/driver/CompilerDriver.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/nativeMain/kotlin/spezi/frontend/Lexer.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/nativeMain/kotlin/spezi/frontend/Lexer.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/nativeMain/kotlin/spezi/frontend/Parser.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/nativeMain/kotlin/spezi/frontend/Parser.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/nativeMain/kotlin/spezi/frontend/semantic/AnalysisContext.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/nativeMain/kotlin/spezi/frontend/semantic/AnalysisContext.kt" afterDir="false" />
+    <list default="true" id="5ac3f443-0b32-4aba-936c-8e4bac2c3fa4" name="Changes" comment="fix: Don't allow structs to be 'int32s'">
+      <change beforePath="$PROJECT_DIR$/src/nativeMain/kotlin/spezi/common/diagnostic/DiagnosticReporter.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/nativeMain/kotlin/spezi/common/diagnostic/DiagnosticReporter.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/nativeMain/kotlin/spezi/frontend/semantic/SemanticAnalyzer.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/nativeMain/kotlin/spezi/frontend/semantic/SemanticAnalyzer.kt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -300,7 +288,7 @@
       <workItem from="1769187962630" duration="7311000" />
       <workItem from="1769195828758" duration="311000" />
       <workItem from="1769202241988" duration="1765000" />
-      <workItem from="1769244795073" duration="435000" />
+      <workItem from="1769244795073" duration="1743000" />
     </task>
     <task id="LOCAL-00001" summary="chore: initial commit">
       <option name="closed" value="true" />
@@ -334,7 +322,15 @@
       <option name="project" value="LOCAL" />
       <updated>1769245229481</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="fix: Don't allow structs to be 'int32s'">
+      <option name="closed" value="true" />
+      <created>1769245431800</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1769245431800</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -345,6 +341,7 @@
     <MESSAGE value="feat: Drastically improve kotlin/native compilation speed" />
     <MESSAGE value="feat: Error if there is no main func" />
     <MESSAGE value="refactor" />
-    <option name="LAST_COMMIT_MESSAGE" value="refactor" />
+    <MESSAGE value="fix: Don't allow structs to be 'int32s'" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix: Don't allow structs to be 'int32s'" />
   </component>
 </project>

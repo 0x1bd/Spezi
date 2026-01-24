@@ -2,6 +2,8 @@ package spezi.frontend.semantic
 
 import spezi.common.diagnostic.CompilerException
 import spezi.common.Context
+import spezi.common.diagnostic.Level
+import spezi.common.diagnostic.report
 import spezi.domain.*
 
 class SemanticAnalyzer(private val ctx: Context, private val prog: Program) {
@@ -12,13 +14,13 @@ class SemanticAnalyzer(private val ctx: Context, private val prog: Program) {
     private val externs = mutableListOf<ExternFnDef>()
     private var hasError = false
 
-    private fun reportError(msg: String, loc: Token) {
-        ctx.reporter.error(msg, loc)
+    private fun error(msg: String) {
+        ctx.report(Level.ERROR, msg)
         hasError = true
     }
 
-    private fun reportError(msg: String) {
-        ctx.reporter.error(msg)
+    private fun error(msg: String, loc: Token) {
+        ctx.report(Level.ERROR, msg, loc)
         hasError = true
     }
 
@@ -37,7 +39,8 @@ class SemanticAnalyzer(private val ctx: Context, private val prog: Program) {
 
         prog.elements.filterIsInstance<FnDef>()
             .firstOrNull { it.name == "main" } ?: run {
-            reportError("Missing main function")
+                
+                error("Missing Main Function")
         }
 
         if (hasError) throw CompilerException("Analysis failed")
@@ -48,14 +51,18 @@ class SemanticAnalyzer(private val ctx: Context, private val prog: Program) {
         analysisCtx.enterScope()
 
         if (fn.extensionOf != null) {
-            if (fn.extensionOf is Type.Struct && !structs.containsKey(fn.extensionOf.name))
-                reportError("Extension struct not found", fn.loc)
+            if (fn.extensionOf is Type.Struct && !structs.containsKey(fn.extensionOf.name)) {
+                error("Extension struct not found")
+            }
 
             analysisCtx.define("self", fn.extensionOf)
         }
 
         fn.args.forEach {
-            if (analysisCtx.isDefinedInCurrentScope(it.first)) reportError("Duplicate argument ${it.first}", fn.loc)
+            if (analysisCtx.isDefinedInCurrentScope(it.first)) {
+                error("Duplicate argument ${it.first}", fn.loc)
+            }
+            
             analysisCtx.define(it.first, it.second)
         }
 
@@ -92,12 +99,12 @@ class SemanticAnalyzer(private val ctx: Context, private val prog: Program) {
         val actualType = s.type ?: inferred
 
         if (actualType == Type.Unknown || actualType == Type.Void) {
-            reportError("Cannot infer type for '${s.name}'", s.loc)
+            error("Cannot infer type for '${s.name}'", s.loc)
         }
 
         if (s.init != null && s.type != null) {
             if (inferred != Type.Error && inferred != actualType) {
-                reportError("Type mismatch. Expected ${actualType.name}, got ${inferred.name}", s.loc)
+                error("Type mismatch. Expected ${actualType.name}, got ${inferred.name}", s.loc)
             }
         }
 
@@ -108,12 +115,13 @@ class SemanticAnalyzer(private val ctx: Context, private val prog: Program) {
     private fun checkAssign(s: Assign) {
         val varType = analysisCtx.lookup(s.name)
         if (varType == null) {
-            reportError("Undefined variable '${s.name}'", s.loc)
+            error("Undefined variable '${s.name}'", s.loc)
             return
         }
+
         val valType = infer(s.value)
         if (valType != Type.Error && varType != valType) {
-            reportError("Assign mismatch: var is ${varType.name}, value is ${valType.name}", s.loc)
+            error("Assign mismatch: var is ${varType.name}, value is ${valType.name}", s.loc)
         }
 
         // TODO: check mutability
@@ -124,7 +132,7 @@ class SemanticAnalyzer(private val ctx: Context, private val prog: Program) {
         val valType = if (s.value != null) infer(s.value) else Type.Void
 
         if (valType != Type.Error && valType != retType) {
-            reportError("Return type mismatch. Expected ${retType.name}, got ${valType.name}", s.loc)
+            error("Return type mismatch. Expected ${retType.name}, got ${valType.name}", s.loc)
         }
     }
 
@@ -135,7 +143,7 @@ class SemanticAnalyzer(private val ctx: Context, private val prog: Program) {
             is LiteralBool -> Type.Bool
             is LiteralString -> Type.String
             is VarRef -> analysisCtx.lookup(e.name) ?: run {
-                reportError("Undefined '${e.name}'", e.loc)
+                error("Undefined '${e.name}'", e.loc)
                 Type.Error
             }
 
@@ -147,6 +155,7 @@ class SemanticAnalyzer(private val ctx: Context, private val prog: Program) {
             is Access -> resolveAccess(e)
             else -> Type.Unknown
         }
+
         e.resolvedType = t
         return t
     }
@@ -158,14 +167,14 @@ class SemanticAnalyzer(private val ctx: Context, private val prog: Program) {
         return when (e.op) {
             TokenType.BANG -> {
                 if (inner != Type.Bool) {
-                    reportError("Operator '!' requires bool, got ${inner.name}", e.loc)
+                    error("Operator '!' requires bool, got ${inner.name}", e.loc)
                     Type.Error
                 } else Type.Bool
             }
 
             TokenType.MINUS -> {
                 if (!inner.isNumber()) {
-                    reportError("Unary '-' requires number, got ${inner.name}", e.loc)
+                    error("Unary '-' requires number, got ${inner.name}", e.loc)
                     Type.Error
                 } else inner
             }
@@ -180,7 +189,7 @@ class SemanticAnalyzer(private val ctx: Context, private val prog: Program) {
         if (l == Type.Error || r == Type.Error) return Type.Error
 
         if (l != r) {
-            reportError("Binary operand mismatch: ${l.name} vs ${r.name}", e.loc)
+            error("Binary operand mismatch: ${l.name} vs ${r.name}", e.loc)
             return Type.Error
         }
 
@@ -189,7 +198,7 @@ class SemanticAnalyzer(private val ctx: Context, private val prog: Program) {
 
             TokenType.PLUS, TokenType.MINUS, TokenType.STAR, TokenType.SLASH -> {
                 if (!l.isNumber()) {
-                    reportError("Math op requires numbers", e.loc)
+                    error("Math op requires numbers", e.loc)
                     Type.Error
                 } else l
             }
@@ -204,14 +213,17 @@ class SemanticAnalyzer(private val ctx: Context, private val prog: Program) {
 
         if (from == Type.Error) return Type.Error
 
-        if (from == to) return to
+        if (from == to) {
+            ctx.report(Level.WARN, "Cast is redundant", c.loc)
+            return to
+        }
 
         if (from.isNumber() && to.isNumber()) return to
 
         if (from == Type.Bool && to.isInt()) return to
         if (from.isInt() && to == Type.Bool) return to
 
-        reportError("Cannot cast type '${from.name}' to '${to.name}'", c.loc)
+        error("Cannot cast type '${from.name}' to '${to.name}'", c.loc)
         return Type.Error
     }
 
@@ -239,10 +251,10 @@ class SemanticAnalyzer(private val ctx: Context, private val prog: Program) {
         }
 
         if (externCandidates.isEmpty() && fnCandidates.isEmpty()) {
-            reportError("Function '${c.name}' not found.", c.loc)
+            error("Function '${c.name}' not found.", c.loc)
         } else {
             val sig = argTypes.joinToString(", ") { it.name }
-            reportError("No matching overload for '${c.name}' with args ($sig)", c.loc)
+            error("No matching overload for '${c.name}' with args ($sig)", c.loc)
         }
 
         return Type.Error
@@ -251,7 +263,7 @@ class SemanticAnalyzer(private val ctx: Context, private val prog: Program) {
     private fun resolveConstructor(c: ConstructorCall): Type {
         val st = structs[c.typeName]
         if (st == null) {
-            reportError("Unknown struct '${c.typeName}'", c.loc)
+            error("Unknown struct '${c.typeName}'", c.loc)
             return Type.Error
         }
 
@@ -263,7 +275,7 @@ class SemanticAnalyzer(private val ctx: Context, private val prog: Program) {
         if (!checkSignature(expectedTypes, argTypes)) {
             val expStr = expectedTypes.joinToString { it.name }
             val gotStr = argTypes.joinToString { it.name }
-            reportError("Constructor mismatch for '${c.typeName}'. Expected ($expStr), got ($gotStr)", c.loc)
+            error("Constructor mismatch for '${c.typeName}'. Expected ($expStr), got ($gotStr)", c.loc)
             return Type.Error
         }
 
@@ -275,19 +287,19 @@ class SemanticAnalyzer(private val ctx: Context, private val prog: Program) {
         if (objType == Type.Error) return Type.Error
 
         if (objType !is Type.Struct) {
-            reportError("Cannot access member '${a.member}' on non-struct type '${objType.name}'", a.loc)
+            error("Cannot access member '${a.member}' on non-struct type '${objType.name}'", a.loc)
             return Type.Error
         }
 
         val def = structs[objType.name]
         if (def == null) {
-            reportError("Struct definition for '${objType.name}' not found.", a.loc)
+            error("Struct definition for '${objType.name}' not found.", a.loc)
             return Type.Error
         }
 
         val field = def.fields.find { it.first == a.member }
         if (field == null) {
-            reportError("Struct '${objType.name}' has no field named '${a.member}'", a.loc)
+            error("Struct '${objType.name}' has no field named '${a.member}'", a.loc)
             return Type.Error
         }
 
