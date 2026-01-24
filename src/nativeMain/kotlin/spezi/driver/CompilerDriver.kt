@@ -2,7 +2,7 @@ package spezi.driver
 
 import okio.FileSystem
 import okio.Path.Companion.toPath
-import platform.posix.*
+import platform.posix.system
 import spezi.backend.LLVMBackend
 import spezi.common.*
 import spezi.common.diagnostic.CompilerException
@@ -19,7 +19,8 @@ object CompilerDriver {
             ctx.reporter.state = CompilationState.Parsing
 
             val time = measureTime {
-                val mainFile = options.inputFiles.firstOrNull() ?: return CompilationResult.Fail
+                val mainFile = options.inputFiles.firstOrNull()
+                    ?: return CompilationResult.Fail
 
                 if (!FileSystem.SYSTEM.exists(mainFile.toPath())) {
                     ctx.reporter.error("Input file not found: $mainFile")
@@ -36,50 +37,70 @@ object CompilerDriver {
                 val analyzer = SemanticAnalyzer(ctx, ast)
                 analyzer.analyze()
 
-                if (ctx.reporter.hasErrors) return CompilationResult.Fail
+                if (ctx.reporter.hasErrors) {
+                    return CompilationResult.Fail
+                }
 
                 ctx.reporter.state = CompilationState.Codegen
+
                 val backend = LLVMBackend(ctx)
+
+                val irPath = "output.ll"
+                val objPath = "output.o"
 
                 try {
                     backend.generate(ast)
-
-                    val irPath = "output.ll"
                     backend.emitToFile(irPath)
 
-                    val success = link(ctx, irPath, options)
-
-                    if (!success) {
-                        throw CompilerException("Linking failed")
+                    if (!runLLC(irPath, objPath)) {
+                        throw CompilerException("llc failed")
                     }
 
-                    if (!options.keepIr) {
-                        FileSystem.SYSTEM.delete(irPath.toPath())
+                    if (!link(objPath, options)) {
+                        throw CompilerException("Linking failed")
                     }
 
                 } finally {
                     backend.dispose()
+
+                    if (!options.keepIr) {
+                        FileSystem.SYSTEM.delete(irPath.toPath(), mustExist = false)
+                        FileSystem.SYSTEM.delete(objPath.toPath(), mustExist = false)
+                    }
                 }
             }
 
             return CompilationResult.Success(time)
+
         } catch (e: Exception) {
             ctx.reporter.error("Compiler Error: ${e.message}")
-            if (options.verbose) e.printStackTrace()
-
+            if (options.verbose) {
+                e.printStackTrace()
+            }
             return CompilationResult.Fail
         }
     }
 
-    private fun link(ctx: Context, irPath: String, options: CompilationOptions): Boolean {
+    private fun runLLC(irPath: String, objPath: String): Boolean {
+        val cmd = "llc $irPath -filetype=obj -o $objPath"
+        return system(cmd) == 0
+    }
+
+    private fun link(objPath: String, options: CompilationOptions): Boolean {
         val libFlags = options.libraries.joinToString(" ") { "-l$it" }
         val defaults = if (options.libraries.isEmpty()) "-lc -lm" else ""
 
-        val cmd = "clang $irPath -o ${options.outputExe} -O${options.optimizationLevel} $libFlags $defaults"
+        val cmd = buildString {
+            append("clang ")
+            append("-fuse-ld=lld ")
+            append(objPath)
+            append(" -o ${options.outputExe} ")
+            append("-O${options.optimizationLevel} ")
+            append(libFlags)
+            append(" ")
+            append(defaults)
+        }
 
-        ctx.reporter.state = CompilationState.Linking
-
-        val res = system(cmd)
-        return res == 0
+        return system(cmd) == 0
     }
 }

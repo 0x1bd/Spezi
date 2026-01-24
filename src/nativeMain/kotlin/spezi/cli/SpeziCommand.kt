@@ -13,10 +13,14 @@ import kotlin.system.exitProcess
 class SpeziCommand : CliktCommand(name = "spezi") {
 
     val input by argument().help("Main source file")
-    val output by option("-o", "--output").default("a.out")
+    val output by option("-o", "--output").default("out.out")
+        .help("Output file")
     val emitIr by option("--emit-ir").flag(default = false)
+        .help("Keep IR files")
     val verbose by option("-v", "--verbose").flag()
+        .help("Enable verbose logging")
     val optLevel by option("-O").int().default(0)
+        .help("Clang optimization level")
     val libs by option("-l").multiple()
     val includes by option("-I").multiple()
 
