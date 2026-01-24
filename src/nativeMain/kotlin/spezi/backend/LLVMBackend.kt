@@ -35,7 +35,7 @@ class LLVMBackend(private val ctx: Context) : Disposable {
         Type.Bool -> LLVMInt1TypeInContext(context)!!
         Type.String -> LLVMPointerType(LLVMInt8TypeInContext(context), 0u)!!
         Type.Void -> LLVMVoidTypeInContext(context)!!
-        is Type.Struct -> LLVMGetTypeByName(module, t.name) ?: LLVMInt32TypeInContext(context)!!
+        is Type.Struct -> LLVMGetTypeByName(module, t.name)!!
 
         else -> LLVMInt32TypeInContext(context)!!
     }
