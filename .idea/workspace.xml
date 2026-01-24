@@ -4,11 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="5ac3f443-0b32-4aba-936c-8e4bac2c3fa4" name="Changes" comment="feat: Improve compilation time by using LLC instead of clang for compilation">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/nativeMain/kotlin/spezi/driver/CompilerDriver.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/nativeMain/kotlin/spezi/driver/CompilerDriver.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/nativeMain/kotlin/spezi/frontend/Lexer.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/nativeMain/kotlin/spezi/frontend/Lexer.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/nativeMain/kotlin/spezi/frontend/Parser.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/nativeMain/kotlin/spezi/frontend/Parser.kt" afterDir="false" />
+    <list default="true" id="5ac3f443-0b32-4aba-936c-8e4bac2c3fa4" name="Changes" comment="refactor: Use .report instead of reporter....">
+      <change beforePath="$PROJECT_DIR$/src/nativeMain/kotlin/spezi/common/diagnostic/DiagnosticReporter.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/nativeMain/kotlin/spezi/common/diagnostic/DiagnosticReporter.kt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -290,7 +287,7 @@
       <workItem from="1769187962630" duration="7311000" />
       <workItem from="1769195828758" duration="311000" />
       <workItem from="1769202241988" duration="1765000" />
-      <workItem from="1769244795073" duration="5818000" />
+      <workItem from="1769244795073" duration="6161000" />
     </task>
     <task id="LOCAL-00001" summary="chore: initial commit">
       <option name="closed" value="true" />
@@ -348,7 +345,15 @@
       <option name="project" value="LOCAL" />
       <updated>1769250470352</updated>
     </task>
-    <option name="localTasksCounter" value="8" />
+    <task id="LOCAL-00008" summary="refactor: Use .report instead of reporter....">
+      <option name="closed" value="true" />
+      <created>1769251630680</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1769251630680</updated>
+    </task>
+    <option name="localTasksCounter" value="9" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -362,6 +367,7 @@
     <MESSAGE value="fix: Don't allow structs to be 'int32s'" />
     <MESSAGE value="refactor: Diagnostic Reporting Levels" />
     <MESSAGE value="feat: Improve compilation time by using LLC instead of clang for compilation" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: Improve compilation time by using LLC instead of clang for compilation" />
+    <MESSAGE value="refactor: Use .report instead of reporter...." />
+    <option name="LAST_COMMIT_MESSAGE" value="refactor: Use .report instead of reporter...." />
   </component>
 </project>

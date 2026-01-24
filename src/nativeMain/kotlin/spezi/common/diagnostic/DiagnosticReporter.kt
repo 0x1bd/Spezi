@@ -15,7 +15,6 @@ class DiagnosticReporter(private val term: Terminal, private val ctx: Context) {
     var state: CompilationState = CompilationState.Reading
         set(value) {
             field = value
-
             if (ctx.options.verbose)
                 info("Transitioning state to $value")
         }
@@ -52,6 +51,9 @@ class DiagnosticReporter(private val term: Terminal, private val ctx: Context) {
         val lineIdx = loc.line - 1
         val rawLine = source.lines.getOrNull(lineIdx) ?: ""
 
+        val lineNoStr = loc.line.toString()
+        val gutterWidth = lineNoStr.length
+
         var padCount = 0
         for (i in 0 until minOf(loc.col - 1, rawLine.length)) {
             padCount += if (rawLine[i] == '\t') 4 else 1
@@ -60,17 +62,21 @@ class DiagnosticReporter(private val term: Terminal, private val ctx: Context) {
         val codeLine = rawLine.replace("\t", "    ")
         val pointerLen = loc.length.coerceAtLeast(1)
 
-        term.println()
-        term.println("${color(bold(level))}: $msg")
-        term.println("  ${gray("-->")} ${source.path}:${loc.line}:${loc.col}")
-        term.println("    ${gray("|")}")
-        term.println("${gray(" ${loc.line} |")} $codeLine")
-
         val pad = " ".repeat(padCount)
         val caret = "^".repeat(pointerLen)
 
+        val paddedLineNo = lineNoStr.padStart(gutterWidth)
+        val emptyGutter = " ".repeat(gutterWidth)
+
+        term.println()
+        term.println("${color(bold(level))}: $msg")
+        term.println("  ${gray("-->")} ${source.path}:${loc.line}:${loc.col}")
+        term.println("  $emptyGutter${gray("|")}")
+
+        term.println(" ${gray("$paddedLineNo |")} $codeLine")
+
         term.println(
-            "    ${gray("|")} $pad${color(caret)} ${color(msg)}"
+            " ${gray("$emptyGutter |")} $pad${color(caret)} ${color(msg)}"
         )
 
         term.println()
