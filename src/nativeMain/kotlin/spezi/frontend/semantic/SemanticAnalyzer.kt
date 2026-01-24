@@ -1,6 +1,6 @@
 package spezi.frontend.semantic
 
-import spezi.common.CompilerException
+import spezi.common.diagnostic.CompilerException
 import spezi.common.Context
 import spezi.domain.*
 
@@ -23,8 +23,6 @@ class SemanticAnalyzer(private val ctx: Context, private val prog: Program) {
     }
 
     fun analyze() {
-        if (ctx.options.verbose) ctx.reporter.info("Semantic Analysis")
-
         prog.elements.forEach {
             when (it) {
                 is StructDef -> structs[it.name] = it
@@ -39,7 +37,7 @@ class SemanticAnalyzer(private val ctx: Context, private val prog: Program) {
 
         prog.elements.filterIsInstance<FnDef>()
             .firstOrNull { it.name == "main" } ?: run {
-                reportError("Missing main function")
+            reportError("Missing main function")
         }
 
         if (hasError) throw CompilerException("Analysis failed")

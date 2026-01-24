@@ -1,6 +1,6 @@
 package spezi.frontend
 
-import spezi.common.CompilerException
+import spezi.common.diagnostic.CompilerException
 import spezi.common.Context
 import spezi.domain.Token
 import spezi.domain.TokenType

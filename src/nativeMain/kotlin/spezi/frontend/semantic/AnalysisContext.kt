@@ -7,7 +7,6 @@ class AnalysisContext {
 
     private val scopes = ArrayDeque<MutableMap<String, Type>>()
     var currentFunction: FnDef? = null
-    var isInsideLoop: Boolean = false
 
     fun enterScope() = scopes.addFirst(mutableMapOf())
     fun exitScope() = scopes.removeFirst()

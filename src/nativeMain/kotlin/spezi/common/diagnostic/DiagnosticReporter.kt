@@ -1,14 +1,24 @@
-package spezi.common
+package spezi.common.diagnostic
 
 import com.github.ajalt.mordant.rendering.TextColors.*
 import com.github.ajalt.mordant.rendering.TextStyle
 import com.github.ajalt.mordant.rendering.TextStyles.*
 import com.github.ajalt.mordant.terminal.Terminal
+import spezi.common.CompilationState
+import spezi.common.Context
 import spezi.domain.Token
 
-class DiagnosticReporter(private val term: Terminal) {
+class DiagnosticReporter(private val term: Terminal, private val ctx: Context) {
     var hasErrors = false
         private set
+
+    var state: CompilationState = CompilationState.Reading
+        set(value) {
+            field = value
+
+            if (ctx.options.verbose)
+                info("Transitioning state to $value")
+        }
 
     fun error(msg: String, loc: Token) {
         hasErrors = true
@@ -26,6 +36,10 @@ class DiagnosticReporter(private val term: Terminal) {
 
     fun info(msg: String) {
         term.println("${blue("INFO:")} $msg")
+    }
+
+    fun warn(msg: String) {
+        term.println("${yellow("WARN:")} $msg")
     }
 
     private fun printDiagnostic(
@@ -72,5 +86,3 @@ class DiagnosticReporter(private val term: Terminal) {
         term.println()
     }
 }
-
-class CompilerException(msg: String) : RuntimeException(msg)

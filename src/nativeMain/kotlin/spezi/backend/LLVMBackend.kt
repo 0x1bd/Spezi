@@ -3,6 +3,7 @@ package spezi.backend
 import kotlinx.cinterop.*
 import llvm.*
 import spezi.common.*
+import spezi.common.diagnostic.CompilerException
 import spezi.domain.*
 
 class LLVMBackend(private val ctx: Context) : Disposable {
@@ -48,8 +49,6 @@ class LLVMBackend(private val ctx: Context) : Disposable {
     }
 
     fun generate(p: Program) {
-        if (ctx.options.verbose) ctx.reporter.info("Starting LLVM Codegen...")
-
         p.elements.filterIsInstance<StructDef>().forEach { s ->
             structs[s.name] = s
             LLVMStructCreateNamed(context, s.name)

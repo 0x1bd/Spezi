@@ -1,6 +1,7 @@
 package spezi.frontend
 
 import spezi.common.*
+import spezi.common.diagnostic.CompilerException
 import spezi.domain.*
 
 class Parser(private val ctx: Context) {
@@ -78,11 +79,11 @@ class Parser(private val ctx: Context) {
             ?: errorAtCurrent("Could not resolve import '$importName'")
 
         if (ctx.isModuleLoaded(path)) {
-            if (ctx.options.verbose) ctx.reporter.info("Recursive import skipped: $path")
+            ctx.reporter.warn("Recursive import skipped: $path")
             return
         }
 
-        if (ctx.options.verbose) ctx.reporter.info("Importing module: $path")
+        ctx.reporter.info("Importing module: $path")
 
         val prevSrc = ctx.source
         val prevLex = lexer
