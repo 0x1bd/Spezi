@@ -21,6 +21,7 @@ Build spezi:
 ## Example code
 
 ### Hello World
+`test.spz`
 ```spezi
 extern fn printf(s: string) -> void
 
@@ -28,3 +29,6 @@ fn main() -> void {
     printf("Hello, World\n")
 }
 ```
+
+### Compiling the example
+Run `./Spezi.kexe test.spz`
