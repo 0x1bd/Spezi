@@ -4,10 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="5ac3f443-0b32-4aba-936c-8e4bac2c3fa4" name="Changes" comment="README.md">
+    <list default="true" id="5ac3f443-0b32-4aba-936c-8e4bac2c3fa4" name="Changes" comment="fix: SpeziCommand should be an object">
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/nativeMain/kotlin/Main.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/nativeMain/kotlin/Main.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/nativeMain/kotlin/spezi/cli/SpeziCommand.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/nativeMain/kotlin/spezi/cli/SpeziCommand.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/nativeMain/kotlin/spezi/frontend/semantic/SemanticAnalyzer.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/nativeMain/kotlin/spezi/frontend/semantic/SemanticAnalyzer.kt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -62,12 +62,12 @@
     &quot;assignee&quot;: &quot;0x1bd&quot;
   }
 }</component>
-  <component name="GithubPullRequestsUISettings">{
-  &quot;selectedUrlAndAccountId&quot;: {
-    &quot;url&quot;: &quot;https://github.com/0x1bd/Spezi.git&quot;,
-    &quot;accountId&quot;: &quot;9d76a070-3de4-4d33-acc6-75965a9c6984&quot;
+  <component name="GithubPullRequestsUISettings"><![CDATA[{
+  "selectedUrlAndAccountId": {
+    "url": "https://github.com/0x1bd/Spezi.git",
+    "accountId": "62d78b7f-364c-4f1e-a3ce-bb66a4f3394a"
   }
-}</component>
+}]]></component>
   <component name="GradleScriptDefinitionsStorage" workingDir="$PROJECT_DIR$" gradleHome="$USER_HOME$/.gradle/wrapper/dists/gradle-9.2.1-bin/2t0n5ozlw9xmuyvbp7dnzaxug/gradle-9.2.1" javaHome="$USER_HOME$/.jdks/graalvm-ce-25.0.1" gradleVersion="9.2.1" />
   <component name="KotlinMultiplatform" KONAN_HOME="$USER_HOME$/.konan/kotlin-native-prebuilt-linux-x86_64-2.3.0">
     <executable TARGET="linux_x64" TARGET_NAME="native" EXECUTABLE_NAME="Spezi" PROJECT_PREFIX="Spezi:" IS_TEST="false">
@@ -289,7 +289,8 @@
       <workItem from="1769187962630" duration="7311000" />
       <workItem from="1769195828758" duration="311000" />
       <workItem from="1769202241988" duration="1765000" />
-      <workItem from="1769244795073" duration="6915000" />
+      <workItem from="1769244795073" duration="8367000" />
+      <workItem from="1769260044552" duration="328000" />
     </task>
     <task id="LOCAL-00001" summary="chore: initial commit">
       <option name="closed" value="true" />
@@ -371,7 +372,15 @@
       <option name="project" value="LOCAL" />
       <updated>1769252210189</updated>
     </task>
-    <option name="localTasksCounter" value="11" />
+    <task id="LOCAL-00011" summary="fix: SpeziCommand should be an object">
+      <option name="closed" value="true" />
+      <created>1769252737905</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1769252737905</updated>
+    </task>
+    <option name="localTasksCounter" value="12" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -388,6 +397,7 @@
     <MESSAGE value="refactor: Use .report instead of reporter...." />
     <MESSAGE value="fix: Diagnostic Reporter indentation" />
     <MESSAGE value="README.md" />
-    <option name="LAST_COMMIT_MESSAGE" value="README.md" />
+    <MESSAGE value="fix: SpeziCommand should be an object" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix: SpeziCommand should be an object" />
   </component>
 </project>

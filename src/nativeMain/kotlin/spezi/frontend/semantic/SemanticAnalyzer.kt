@@ -234,7 +234,7 @@ class SemanticAnalyzer(private val ctx: Context, private val prog: Program) {
         val externCandidates = externs.filter { it.name == c.name }
         for (ext in externCandidates) {
             val expected = ext.args.map { it.second }
-            if (checkSignature(expected, argTypes)) {
+            if (expected == argTypes) {
                 return ext.retType
             }
         }
@@ -245,7 +245,7 @@ class SemanticAnalyzer(private val ctx: Context, private val prog: Program) {
             if (fn.extensionOf != null) expectedTypes.add(fn.extensionOf)
             expectedTypes.addAll(fn.args.map { it.second })
 
-            if (checkSignature(expectedTypes, argTypes)) {
+            if (expectedTypes == argTypes) {
                 return fn.retType
             }
         }
@@ -272,7 +272,7 @@ class SemanticAnalyzer(private val ctx: Context, private val prog: Program) {
 
         if (argTypes.any { it == Type.Error }) return Type.Error
 
-        if (!checkSignature(expectedTypes, argTypes)) {
+        if (expectedTypes != argTypes) {
             val expStr = expectedTypes.joinToString { it.name }
             val gotStr = argTypes.joinToString { it.name }
             error("Constructor mismatch for '${c.typeName}'. Expected ($expStr), got ($gotStr)", c.loc)
@@ -304,16 +304,6 @@ class SemanticAnalyzer(private val ctx: Context, private val prog: Program) {
         }
 
         return field.second
-    }
-
-    private fun checkSignature(expected: List<Type>, actual: List<Type>): Boolean {
-        if (expected.size != actual.size) return false
-
-        for (i in expected.indices) {
-            if (expected[i] != actual[i]) return false
-        }
-
-        return true
     }
 
 }
