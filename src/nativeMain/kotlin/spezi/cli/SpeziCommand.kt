@@ -10,7 +10,7 @@ import spezi.driver.CompilationResult
 import spezi.driver.CompilerDriver.compile
 import kotlin.system.exitProcess
 
-class SpeziCommand : CliktCommand(name = "spezi") {
+object SpeziCommand : CliktCommand(name = "spezi") {
 
     val input by argument().help("Main source file")
     val output by option("-o", "--output").default("out.out")

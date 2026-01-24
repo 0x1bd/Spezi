@@ -4,8 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="5ac3f443-0b32-4aba-936c-8e4bac2c3fa4" name="Changes" comment="refactor: Use .report instead of reporter....">
-      <change beforePath="$PROJECT_DIR$/src/nativeMain/kotlin/spezi/common/diagnostic/DiagnosticReporter.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/nativeMain/kotlin/spezi/common/diagnostic/DiagnosticReporter.kt" afterDir="false" />
+    <list default="true" id="5ac3f443-0b32-4aba-936c-8e4bac2c3fa4" name="Changes" comment="README.md">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/nativeMain/kotlin/Main.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/nativeMain/kotlin/Main.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/nativeMain/kotlin/spezi/cli/SpeziCommand.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/nativeMain/kotlin/spezi/cli/SpeziCommand.kt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -287,7 +289,7 @@
       <workItem from="1769187962630" duration="7311000" />
       <workItem from="1769195828758" duration="311000" />
       <workItem from="1769202241988" duration="1765000" />
-      <workItem from="1769244795073" duration="6161000" />
+      <workItem from="1769244795073" duration="6915000" />
     </task>
     <task id="LOCAL-00001" summary="chore: initial commit">
       <option name="closed" value="true" />
@@ -353,7 +355,23 @@
       <option name="project" value="LOCAL" />
       <updated>1769251630680</updated>
     </task>
-    <option name="localTasksCounter" value="9" />
+    <task id="LOCAL-00009" summary="fix: Diagnostic Reporter indentation">
+      <option name="closed" value="true" />
+      <created>1769251978382</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1769251978382</updated>
+    </task>
+    <task id="LOCAL-00010" summary="README.md">
+      <option name="closed" value="true" />
+      <created>1769252210189</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1769252210189</updated>
+    </task>
+    <option name="localTasksCounter" value="11" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -368,6 +386,8 @@
     <MESSAGE value="refactor: Diagnostic Reporting Levels" />
     <MESSAGE value="feat: Improve compilation time by using LLC instead of clang for compilation" />
     <MESSAGE value="refactor: Use .report instead of reporter...." />
-    <option name="LAST_COMMIT_MESSAGE" value="refactor: Use .report instead of reporter...." />
+    <MESSAGE value="fix: Diagnostic Reporter indentation" />
+    <MESSAGE value="README.md" />
+    <option name="LAST_COMMIT_MESSAGE" value="README.md" />
   </component>
 </project>
