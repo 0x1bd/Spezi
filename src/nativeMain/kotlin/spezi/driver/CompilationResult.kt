@@ -1,13 +1,18 @@
 package spezi.driver
 
+import spezi.common.diagnostic.Diagnostic
 import kotlin.time.Duration
 
-abstract class CompilationResult {
+sealed class CompilationResult {
 
-    class Success(
+    abstract val diagnostics: List<Diagnostic>
+
+    data class Success(
         val compilationDuration: Duration,
+        override val diagnostics: List<Diagnostic>
     ) : CompilationResult()
 
-    object Fail : CompilationResult()
-
+    data class Fail(
+        override val diagnostics: List<Diagnostic>
+    ) : CompilationResult()
 }

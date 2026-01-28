@@ -5,7 +5,6 @@ enum class CompilationState {
     Reading,
     Parsing,
     SemanticAnalysis,
-    Codegen,
-    Linking
+    Codegen
 
 }

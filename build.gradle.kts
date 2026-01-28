@@ -15,12 +15,6 @@ kotlin {
     }
 
     linuxX64("native") {
-        compilations["main"].cinterops {
-            val llvm by creating {
-                defFile(project.file("src/nativeInterop/cinterop/llvm.def"))
-            }
-        }
-
         binaries {
             executable {
                 entryPoint = "main"

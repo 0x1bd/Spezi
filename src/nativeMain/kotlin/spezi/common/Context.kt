@@ -1,28 +1,24 @@
 package spezi.common
 
-import com.github.ajalt.mordant.terminal.Terminal
 import okio.FileSystem
 import okio.Path.Companion.toPath
 import spezi.common.diagnostic.DiagnosticReporter
+import spezi.common.diagnostic.Level
+import spezi.domain.Token
 
 class Context(val options: CompilationOptions) {
 
-    val terminal = Terminal()
-    val reporter = DiagnosticReporter(terminal, this)
-
+    val reporter = DiagnosticReporter(this)
+    var state: CompilationState = CompilationState.Reading
     var currentSource: SourceFile = SourceFile("<unknown>", "")
-
-    var source: SourceFile
-        get() = currentSource
-        set(value) {
-            currentSource = value
-        }
-
     private val loadedModules = mutableSetOf<String>()
+
+    fun report(level: Level, msg: String, loc: Token? = null) {
+        reporter.report(level, msg, loc)
+    }
 
     fun resolveImport(importName: String): String? {
         val relativePath = importName.replace('.', '/') + ".spz"
-
         val local = relativePath.toPath()
         if (FileSystem.SYSTEM.exists(local)) return local.toString()
 

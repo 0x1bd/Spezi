@@ -8,12 +8,14 @@ sealed interface AstNode {
 data class Program(val elements: List<AstNode>, override val loc: Token) : AstNode
 
 data class StructDef(
+    val module: String,
     val name: String,
     val fields: List<Pair<String, Type>>,
     override val loc: Token
 ) : AstNode
 
 data class FnDef(
+    val module: String,
     val name: String,
     val extensionOf: Type?,
     val args: List<Pair<String, Type>>,

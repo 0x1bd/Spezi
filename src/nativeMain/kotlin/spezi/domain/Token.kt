@@ -3,18 +3,34 @@ package spezi.domain
 import spezi.common.SourceFile
 
 enum class TokenType {
-    EOF, ID, INT_LIT, FLOAT_LIT, STRING_LIT,
+    EOF, ID,
 
-    LET, MUT, FN, STRUCT, IMPORT, IF, ELSE, RETURN, EXTERN, NEW, AS,
+    // Literals
+    INT_LIT, FLOAT_LIT, STRING_LIT, TRUE, FALSE,
 
-    KW_VOID, KW_BOOL, KW_STRING, KW_I32, KW_I64, KW_F32, KW_F64,
+    // Keywords
+    LET, MUT, FN, STRUCT, IMPORT,
+    IF, ELSE, RETURN, EXTERN, NEW, AS,
 
-    TRUE, FALSE,
+    // Types
+    KW_VOID, KW_BOOL, KW_STRING,
+    KW_I32, KW_I64, KW_F32, KW_F64,
 
-    COLON, EQ, EQEQ, NEQ,
-    PLUS, MINUS, STAR, SLASH, PERCENT, BANG,
-    AMP, PIPE, CARET, TILDE, LSHIFT, RSHIFT,
-    LPAREN, RPAREN, LBRACE, RBRACE, DOT, COMMA, ARROW
+    // Symbols
+    COLON, EQ, ARROW, DOT, COMMA,
+    LPAREN, RPAREN, LBRACE, RBRACE,
+
+    // Operations
+    EQEQ, NEQ,
+    LESS, LESS_EQ, GREATER, GREATER_EQ,
+    PLUS, MINUS, STAR, SLASH, PERCENT,
+
+    // Bitwise
+    AMP, PIPE, CARET, TILDE,
+    LSHIFT, RSHIFT,
+
+    // Unary
+    BANG
 }
 
 data class Token(

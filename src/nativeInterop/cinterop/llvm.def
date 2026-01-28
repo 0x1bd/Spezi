@@ -1,5 +1,0 @@
-headers = llvm-c/Core.h llvm-c/Analysis.h llvm-c/Target.h llvm-c/BitWriter.h
-headerFilter = llvm-c/*
-
-compilerOpts.linux = -I/usr/lib64/llvm21/include
-linkerOpts.linux = -L/usr/lib64 -lLLVM-21
